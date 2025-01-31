@@ -31,4 +31,4 @@ Ensure you have the following installed:
 
 ### result:
 
-![Project](./public/homepage.png)
+![Project](./client/public/homepage.png)
