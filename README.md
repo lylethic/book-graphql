@@ -22,4 +22,13 @@ This project is a simple CRUD (Create, Read, Update, Delete) application for man
 
 ## Result:
 
+### Prerequisites
+
+Ensure you have the following installed:
+
+- Node.js (v20)
+- yarn server
+
+### result:
+
 ![Project](./client/public/homepage.png)
