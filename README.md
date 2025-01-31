@@ -20,15 +20,6 @@ This project is a simple CRUD (Create, Read, Update, Delete) application for man
   - GraphQL
   - Apollo Server (not included in this project, but can be used with the backend)
 
-## Getting Started
+## Result:
 
-### Prerequisites
-
-Ensure you have the following installed:
-
-- Node.js (v20)
-- yarn server
-
-### result:
-
-![Project](./public/homepage.png)
+![Project](./client/public/homepage.png)
