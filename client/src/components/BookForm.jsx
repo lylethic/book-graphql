@@ -1,44 +1,91 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { getAuthors, getBooks } from '../graphql-client/queries';
-import { addSingleBook } from '../graphql-client/mutation';
+import { addSingleBook, updateBook } from '../graphql-client/mutation';
 import { Form, Button } from 'react-bootstrap';
+import GenreSelectForm from './genre-select-form';
 
-const BookForm = () => {
-	const [newBook, setNewBook] = useState({
+const BookForm = ({ isDialogOpen, setIsDialogOpen, book }) => {
+	const [bookData, setBookData] = useState({
+		id: '',
 		name: '',
 		genre: '',
 		authorId: '',
 	});
 
-	const { name, genre, authorId } = newBook;
+	// Update form when a book is passed (edit mode)
+	useEffect(() => {
+		if (book) {
+			setBookData({
+				id: book.id,
+				name: book.name || '',
+				genre: book.genre?.id || '',
+				authorId: book.author?.id || '',
+			});
+		}
+	}, [book]);
+
+	const { id, name, genre, authorId } = bookData;
 
 	const onInputChange = (event) => {
-		setNewBook({
-			...newBook,
-			[event.target.name]: event.target.value,
-		});
+		setBookData({ ...bookData, [event.target.name]: event.target.value });
 	};
 
-	const onSubmit = (e) => {
-		e.preventDefault();
-		addBook({
-			variables: { name, genre, authorId },
-			refetchQueries: [{ query: getBooks }],
-		});
-
-		setNewBook({ name: '', genre: '', authorId: '' });
+	const onGenreChange = (selectedGenre) => {
+		setBookData((prevBook) => ({ ...prevBook, genre: selectedGenre }));
 	};
 
-	//GraphQL operations
+	// GraphQL operations
 	const { loading, data } = useQuery(getAuthors);
-	const [addBook, dataMutation] = useMutation(addSingleBook);
+	const [addBook] = useMutation(addSingleBook, {
+		refetchQueries: [{ query: getBooks }],
+	});
+	const [editBook] = useMutation(updateBook);
 
-	console.log(dataMutation);
+	const onSubmit = async (e) => {
+		e.preventDefault();
+
+		if (book) {
+			// Update existing book
+			await editBook({
+				variables: {
+					id: book.id,
+					name,
+					genre,
+					authorId,
+				},
+			});
+			setIsDialogOpen(false);
+			console.log({
+				id: book.id,
+				name,
+				genre,
+				authorId,
+			});
+		} else {
+			await addBook({
+				variables: { name, genre, authorId },
+			});
+		}
+		setBookData({ id: '', name: '', genre: '', authorId: '' });
+	};
 
 	return (
 		<Form onSubmit={onSubmit}>
-			<h4>Add new book</h4>
+			<h4>{book ? '' : 'Add New Book'}</h4>
+			{book && (
+				<Form.Group>
+					<Form.Control
+						className='mb-2'
+						type='text'
+						placeholder='BookId...'
+						name='id'
+						value={id}
+						onChange={onInputChange}
+						disabled
+					/>
+				</Form.Group>
+			)}
 			<Form.Group>
 				<Form.Control
 					className='mb-2'
@@ -47,17 +94,13 @@ const BookForm = () => {
 					name='name'
 					value={name}
 					onChange={onInputChange}
-				></Form.Control>
+				/>
 			</Form.Group>
 			<Form.Group className='mb-2'>
-				<Form.Control
-					className='mb-2'
-					type='text'
-					placeholder='Book genre...'
-					name='genre'
-					value={genre}
-					onChange={onInputChange}
-				></Form.Control>
+				<GenreSelectForm
+					selectedGenre={genre}
+					onSelectedGenre={onGenreChange}
+				/>
 			</Form.Group>
 
 			<Form.Group className='mb-2'>
@@ -73,7 +116,7 @@ const BookForm = () => {
 						<option value='' disabled>
 							Select author
 						</option>
-						{data.authors.map((author) => (
+						{data?.authors.map((author) => (
 							<option key={author.id} value={author.id}>
 								{author.name}
 							</option>
@@ -83,7 +126,7 @@ const BookForm = () => {
 			</Form.Group>
 
 			<Button className='float-right' variant='primary' type='submit'>
-				Add Book
+				{book ? 'Update Book' : 'Add Book'}
 			</Button>
 		</Form>
 	);

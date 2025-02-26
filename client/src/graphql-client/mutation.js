@@ -1,14 +1,18 @@
 import { gql } from '@apollo/client';
 
 const addSingleBook = gql`
-	mutation addSingleBookMutation(
-		$name: String
-		$genre: String
-		$authorId: ID!
-	) {
-		createBook(name: $name, genre: $genre, authorId: $authorId) {
+	mutation ($name: String, $genre: ID!, $authorId: ID!) {
+		createBook(genre: $genre, authorId: $authorId, name: $name) {
 			id
 			name
+			author {
+				id
+				name
+			}
+			genre {
+				id
+				name
+			}
 		}
 	}
 `;
@@ -28,7 +32,6 @@ const deleteBook = gql`
 		deleteBook(id: $id) {
 			id
 			name
-			genre
 		}
 	}
 `;
@@ -62,11 +65,95 @@ const bulkDeleteAuthor = gql`
 	}
 `;
 
+const addGenre = gql`
+	mutation ($name: String, $desciption: String) {
+		createGenre(name: $name, description: $desciption) {
+			id
+			name
+			description
+		}
+	}
+`;
+
+const addGenres = gql`
+	mutation ($genres: [GenreInput!]!) {
+		createGenres(genres: $genres) {
+			id
+			name
+			description
+		}
+	}
+`;
+
+const updateGenre = gql`
+	mutation ($updateGenreId: ID!, $name: String, $description: String) {
+		updateGenre(id: $updateGenreId, name: $name, description: $description) {
+			id
+			name
+			description
+		}
+	}
+`;
+
+const deleteGenre = gql`
+	mutation ($deleteGenreId: ID!) {
+		deleteGenre(id: $deleteGenreId) {
+			id
+			name
+			description
+		}
+	}
+`;
+
+const deleteGenres = gql`
+	mutation ($ids: [ID!]!) {
+		deleteGenresByCondition(ids: $ids) {
+			message
+			success
+		}
+	}
+`;
+
+const updateBook = gql`
+	mutation ($id: ID!, $name: String, $genre: String, $authorId: ID) {
+		updateBook(id: $id, name: $name, genre: $genre, authorId: $authorId) {
+			id
+			name
+			genre {
+				id
+				name
+			}
+			author {
+				id
+				name
+				age
+			}
+		}
+	}
+`;
+
+const updateAuthor = gql`
+	mutation ($updateAuthorId: ID!, $name: String, $age: Int) {
+		updateAuthor(id: $updateAuthorId, name: $name, age: $age) {
+			id
+			name
+			age
+		}
+	}
+`;
+
 export {
 	addSingleBook,
 	addSingleAuthor,
+	addGenre,
+	addGenres,
 	deleteBook,
 	bulkDeleteBook,
 	deleteAuthor,
 	bulkDeleteAuthor,
+	deleteGenre,
+	deleteGenres,
+	updateBook,
+	updateAuthor,
+	updateGenre,
 };

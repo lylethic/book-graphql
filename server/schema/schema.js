@@ -1,13 +1,10 @@
 const { gql } = require('apollo-server-express');
-const { GraphQLJSON } = require('graphql-type-json');
 
 const typeDefs = gql`
-	scalar JSON
-
 	type Book {
-		id: ID
+		id: ID!
 		name: String
-		genre: String
+		genre: Genre
 		author: Author
 	}
 
@@ -18,9 +15,20 @@ const typeDefs = gql`
 		books: [Book]
 	}
 
+	type Genre {
+		id: ID!
+		name: String
+		description: String
+	}
+
 	type DeleteResponse {
 		success: Boolean
 		message: String
+	}
+
+	input GenreInput {
+		name: String!
+		description: String
 	}
 
 	#ROOT TYPE
@@ -29,15 +37,26 @@ const typeDefs = gql`
 		book(id: ID!): Book
 		authors: [Author]
 		author(id: ID!): Author
+		genres: [Genre]
+		genre(id: ID!): Genre
 	}
 
 	type Mutation {
 		createAuthor(name: String, age: Int): Author
-		createBook(name: String, genre: String, authorId: ID!): Book
-		deleteBook(id: ID!): Book
 		deleteAuthor(id: ID!): Author
-		deleteBooksByCondition(ids: [ID!]!): DeleteResponse
+		updateAuthor(id: ID!, name: String, age: Int): Author
 		deleteAuthorsByCondition(ids: [ID!]!): DeleteResponse
+
+		createBook(name: String, genre: ID!, authorId: ID!): Book
+		updateBook(id: ID!, name: String, genre: String, authorId: ID): Book
+		deleteBook(id: ID!): Book
+		deleteBooksByCondition(ids: [ID!]!): DeleteResponse
+
+		createGenre(name: String, description: String): Genre
+		createGenres(genres: [GenreInput!]!): [Genre]
+		updateGenre(id: ID!, name: String, description: String): Genre
+		deleteGenre(id: ID!): Genre
+		deleteGenresByCondition(ids: [ID!]!): DeleteResponse
 	}
 `;
 

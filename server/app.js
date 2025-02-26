@@ -2,6 +2,7 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config();
 
 // Load schema and resolver
 const typeDefs = require('./schema/schema');
@@ -13,14 +14,10 @@ const mongoDataMethods = require('./data/db');
 //Connect to MongoDB
 const connectDb = async () => {
 	try {
-		await mongoose.connect(
-			'mongodb+srv://lely0168340:lyvaly2003@graphql.ihkog3d.mongodb.net/?retryWrites=true&w=majority&appName=GraphQL',
-			{
-				useNewUrlParser: true,
-				useUnifiedTopology: true,
-				useUnifiedTopology: true,
-			}
-		);
+		await mongoose.connect(process.env.CONNECTION_MongoDB, {
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+		});
 		console.log('MongoDb connected');
 	} catch (error) {
 		console.log(error.message);

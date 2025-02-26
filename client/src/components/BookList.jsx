@@ -29,7 +29,7 @@ const BookList = () => {
 							key={book.id}
 							border='info'
 							text='info'
-							className='m-2 text-center shadow pointer'
+							className='m-2 text-center shadow pointer text-capitalize'
 							onClick={setBookSelected.bind(this, book.id)}
 						>
 							{book.name}

@@ -14,7 +14,11 @@ const getSingleBook = gql`
 		book(id: $id) {
 			id
 			name
-			genre
+			genre {
+				id
+				name
+				description
+			}
 			author {
 				id
 				name
@@ -46,10 +50,41 @@ const getSingleAuthor = gql`
 			books {
 				id
 				name
-				genre
+				genre {
+					id
+					name
+					description
+				}
 			}
 		}
 	}
 `;
 
-export { getBooks, getSingleBook, getAuthors, getSingleAuthor };
+const getGenres = gql`
+	query getGenresQuery {
+		genres {
+			id
+			name
+			description
+		}
+	}
+`;
+
+const getSingleGenre = gql`
+	query ($id: ID!) {
+		genre(id: $id) {
+			id
+			name
+			description
+		}
+	}
+`;
+
+export {
+	getBooks,
+	getSingleBook,
+	getAuthors,
+	getSingleAuthor,
+	getGenres,
+	getSingleGenre,
+};
