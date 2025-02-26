@@ -1,4 +1,4 @@
-# Book CRUD with React, GraphQL, and Apollo
+# Book CRUD with React, NodeJS, GraphQL with Apollo
 
 This project is a simple CRUD (Create, Read, Update, Delete) application for managing books. It is built using ReactJS on the front-end and GraphQL with Apollo Client for handling data fetching, state management, and communication with the server.
 
@@ -17,10 +17,10 @@ This project is a simple CRUD (Create, Read, Update, Delete) application for man
   - Apollo Client
   - Bootstrap (for UI components)
 - **Backend:**
-  - GraphQL
-  - Apollo Server (not included in this project, but can be used with the backend)
-  - NodeJS, ExpressJS
+  - NodeJS
+  - API: GraphQL
+  - Apollo Server
 
-## Result:
+### Results:
 
 ![Project](./client/public/homepage.png)
