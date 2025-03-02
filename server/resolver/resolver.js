@@ -1,5 +1,3 @@
-const mongoDataMethods = require('../data/db');
-
 const resolvers = {
 	//Query
 	Query: {
@@ -19,12 +17,25 @@ const resolvers = {
 			await mongoDataMethods.getAllGenres(),
 
 		genre: async (parent, { id }, { mongoDataMethods }) =>
-			await mongoDataMethods.getGenreById(),
+			await mongoDataMethods.getGenreById(id),
+
+		transactions: async (parent, args, { mongoDataMethods }) =>
+			await mongoDataMethods.getAllTransations(),
+
+		transaction: async (parent, { id }, { mongoDataMethods }) =>
+			await mongoDataMethods.getTransactionById(id),
+
+		users: async (parent, args, { mongoDataMethods }) =>
+			await mongoDataMethods.getAllUsers(args),
+
+		user: async (parent, { id }, { mongoDataMethods }) =>
+			await mongoDataMethods.getUserById(id),
 	},
 
 	Book: {
 		author: async ({ authorId }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getAuthorById(authorId),
+
 		genre: async ({ genre }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getGenreById(genre),
 	},
@@ -50,6 +61,17 @@ const resolvers = {
 			return await mongoDataMethods.createGenres(genres);
 		},
 
+		createUser: async (parent, args, { mongoDataMethods }) =>
+			await mongoDataMethods.createUser(args),
+
+		createTransactions: async (parent, args, { mongoDataMethods }) => {
+			const { trans } = args;
+			return await mongoDataMethods.createTransactions(trans);
+		},
+
+		createTransaction: async (parent, args, { mongoDataMethods }) =>
+			await mongoDataMethods.createTransaction(args),
+
 		deleteBook: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.deleteBook(id),
 
@@ -66,7 +88,16 @@ const resolvers = {
 			await mongoDataMethods.deleteGenre(id),
 
 		deleteGenresByCondition: async (parent, { ids }, { mongoDataMethods }) =>
-			await mongoDataMethods.deleteGenresByCondition(ids),
+			await mongoDataMethods.deleteTransaction(ids),
+
+		deleteTransaction: async (parent, { id }, { mongoDataMethods }) =>
+			await mongoDataMethods.deleteGenre(id),
+
+		deleteTransactionByCondition: async (
+			parent,
+			{ ids },
+			{ mongoDataMethods }
+		) => await mongoDataMethods.deleteTransactionByCondition(ids),
 
 		updateBook: async (
 			_,

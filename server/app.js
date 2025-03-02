@@ -14,7 +14,7 @@ const mongoDataMethods = require('./data/db');
 //Connect to MongoDB
 const connectDb = async () => {
 	try {
-		await mongoose.connect(process.env.CONNECTION_MongoDB, {
+		await mongoose.connect(String(process.env.CONNECTION_MongoDB), {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		});
