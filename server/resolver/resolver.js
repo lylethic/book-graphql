@@ -2,25 +2,25 @@ const resolvers = {
 	//Query
 	Query: {
 		books: async (parent, args, { mongoDataMethods }) =>
-			await mongoDataMethods.getAllBooks(),
+			await mongoDataMethods.getAllBooks(args),
 
 		book: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getBookById(id),
 
 		authors: async (parent, args, { mongoDataMethods }) =>
-			await mongoDataMethods.getAllAuthor(),
+			await mongoDataMethods.getAllAuthor(args),
 
 		author: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getAuthorById(id),
 
 		genres: async (parent, args, { mongoDataMethods }) =>
-			await mongoDataMethods.getAllGenres(),
+			await mongoDataMethods.getAllGenres(args),
 
 		genre: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getGenreById(id),
 
 		transactions: async (parent, args, { mongoDataMethods }) =>
-			await mongoDataMethods.getAllTransations(),
+			await mongoDataMethods.getAllTransactions(args),
 
 		transaction: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getTransactionById(id),
@@ -43,6 +43,13 @@ const resolvers = {
 	Author: {
 		books: async ({ id }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getAllBooks({ authorId: id }),
+	},
+
+	Transaction: {
+		userId: async ({ userId }, args, { mongoDataMethods }) =>
+			await mongoDataMethods.getUserById(userId),
+		bookId: async ({ bookId }, args, { mongoDataMethods }) =>
+			await mongoDataMethods.getBookById(bookId),
 	},
 
 	// MUTATION
@@ -71,6 +78,9 @@ const resolvers = {
 
 		createTransaction: async (parent, args, { mongoDataMethods }) =>
 			await mongoDataMethods.createTransaction(args),
+
+		returnBookTransaction: async (_, { transactionId }, { mongoDataMethods }) =>
+			await mongoDataMethods.returnBookTransaction(transactionId),
 
 		deleteBook: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.deleteBook(id),
@@ -110,9 +120,16 @@ const resolvers = {
 		updateAuthor: async (_, { id, name, age }, { mongoDataMethods }) => {
 			return await mongoDataMethods.updateAuthor(id, { name, age });
 		},
+
 		updateGenre: async (_, { id, name, description }, { mongoDataMethods }) => {
 			return await mongoDataMethods.updateGenre(id, { name, description });
 		},
+
+		updateUser: async (_, { id, name, email, role }, { mongoDataMethods }) =>
+			await mongoDataMethods.updateUser(id, { name, email, role }),
+
+		deleteUser: async (parent, { id }, { mongoDataMethods }) =>
+			await mongoDataMethods.deleteUser(id),
 	},
 };
 

@@ -116,7 +116,7 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book }) => {
 						<option value='' disabled>
 							Select author
 						</option>
-						{data?.authors.map((author) => (
+						{data?.authors.authors.map((author) => (
 							<option key={author.id} value={author.id}>
 								{author.name}
 							</option>

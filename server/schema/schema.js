@@ -23,8 +23,8 @@ const typeDefs = gql`
 
 	type Transaction {
 		id: ID!
-		userId: ID!
-		bookId: ID!
+		userId: User
+		bookId: Book
 		borrowDate: String!
 		dueDate: String!
 		returnDate: String
@@ -39,6 +39,7 @@ const typeDefs = gql`
 	type User {
 		id: ID!
 		name: String
+		email: String
 		password: String
 		role: String
 	}
@@ -52,6 +53,9 @@ const typeDefs = gql`
 		userId: ID!
 		bookId: ID!
 		dueDate: String!
+		borrowDate: String!
+		returnDate: String
+		status: String!
 	}
 
 	type UserPage {
@@ -59,15 +63,35 @@ const typeDefs = gql`
 		nextCursor: ID
 	}
 
+	type BookPage {
+		books: [Book!]!
+		nextCursor: ID
+	}
+
+	type AuthorPage {
+		authors: [Author!]!
+		nextCursor: ID
+	}
+
+	type GenrePage {
+		genres: [Genre!]!
+		nextCursor: ID
+	}
+
+	type TransactionPage {
+		transactions: [Transaction!]!
+		nextCursor: ID
+	}
+
 	#ROOT TYPE
 	type Query {
-		books: [Book]
+		books(limit: Int, cursor: ID): BookPage
 		book(id: ID!): Book
-		authors: [Author]
+		authors(limit: Int, cursor: ID): AuthorPage
 		author(id: ID!): Author
-		genres: [Genre]
+		genres(limit: Int, cursor: ID): GenrePage
 		genre(id: ID!): Genre
-		transactions: [Transaction]
+		transactions(limit: Int, cursor: ID): TransactionPage
 		transaction(id: ID!): Transaction
 		users(limit: Int, cursor: ID): UserPage
 		user(id: ID!): User
@@ -90,8 +114,16 @@ const typeDefs = gql`
 		deleteGenre(id: ID!): Genre
 		deleteGenresByCondition(ids: [ID!]!): DeleteResponse
 
-		createTransaction(memberId: ID!, bookId: ID!, dueDate: String!): Transaction
+		createTransaction(
+			userId: ID!
+			bookId: ID!
+			dueDate: String!
+			borrowDate: String!
+			returnDate: String
+			status: String!
+		): Transaction
 		createTransactions(trans: [TransactionInput]!): [Transaction]
+		returnBookTransaction(transactionId: ID!): Transaction!
 		updateTransaction(
 			id: ID!
 			userId: ID!

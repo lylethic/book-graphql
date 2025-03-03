@@ -133,11 +133,77 @@ const updateBook = gql`
 `;
 
 const updateAuthor = gql`
-	mutation ($updateAuthorId: ID!, $name: String, $age: Int) {
-		updateAuthor(id: $updateAuthorId, name: $name, age: $age) {
+	mutation ($id: ID!, $name: String, $age: Int) {
+		updateAuthor(id: $id, name: $name, age: $age) {
 			id
 			name
 			age
+		}
+	}
+`;
+
+const createUser = gql`
+	mutation ($name: String, $email: String, $password: String, $role: String) {
+		createUser(name: $name, email: $email, password: $password, role: $role) {
+			id
+			name
+			email
+			role
+		}
+	}
+`;
+
+const deleteUser = gql`
+	mutation ($id: ID!) {
+		deleteUser(id: $id) {
+			id
+			email
+			name
+			role
+		}
+	}
+`;
+
+const updateUser = gql`
+	mutation ($id: ID!, $email: String, $name: String, $role: String) {
+		updateUser(id: $id, name: $name, email: $email, role: $role) {
+			id
+			name
+			email
+			role
+		}
+	}
+`;
+
+const transactionBorrow = gql`
+	mutation ($trans: [TransactionInput]!) {
+		createTransactions(trans: $trans) {
+			id
+			userId
+			bookId
+			dueDate
+			borrowDate
+			returnDate
+			status
+		}
+	}
+`;
+
+const returnBookTransation = gql`
+	mutation ($transactionId: ID!) {
+		returnBookTransaction(transactionId: $transactionId) {
+			id
+			userId {
+				id
+				email
+			}
+			bookId {
+				id
+				name
+			}
+			borrowDate
+			dueDate
+			status
 		}
 	}
 `;
@@ -156,4 +222,9 @@ export {
 	updateBook,
 	updateAuthor,
 	updateGenre,
+	createUser,
+	deleteUser,
+	transactionBorrow,
+	returnBookTransation,
+	updateUser,
 };

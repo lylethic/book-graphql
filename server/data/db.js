@@ -5,16 +5,74 @@ const User = require('../models/user');
 const Transaction = require('../models/transaction');
 
 const mongoDataMethods = {
-	getAllBooks: async (condition = null) =>
+	getAllBooks: async ({ limit = 50, cursor }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Lấy _id lớn hơn cursor
+		}
+
+		const books = await Book.find(filter)
+			.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
+			.limit(limit)
+			.exec();
+
+		const nextCursor = books.length > 0 ? books[books.length - 1]._id : null;
+
+		return {
+			books: books,
+			nextCursor,
+		};
+	},
+
+	getBooks: async (condition = null) =>
 		condition === null ? await Book.find() : await Book.find(condition),
 
 	getBookById: async (id) => await Book.findById(id),
 
-	getAllAuthor: async () => await Author.find(),
+	getAllAuthor: async ({ limit = 100, cursor }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Lấy _id lớn hơn cursor
+		}
+
+		const authors = await Author.find(filter)
+			.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
+			.limit(limit)
+			.exec();
+
+		const nextCursor =
+			authors.length > 0 ? authors[authors.length - 1]._id : null;
+
+		return {
+			authors: authors,
+			nextCursor,
+		};
+	},
+
+	getAuthors: async (condition = null) =>
+		condition === null ? await Author.find() : await Author.find(condition),
 
 	getAuthorById: async (id) => await Author.findById(id),
 
-	getAllGenres: async (condition = null) =>
+	getAllGenres: async ({ limit = 50, cursor }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Lấy có _id lớn hơn cursor
+		}
+
+		const genres = await Genre.find(filter)
+			.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
+			.limit(limit)
+			.exec();
+
+		const nextCursor = genres.length > 0 ? genres[genres.length - 1]._id : null;
+
+		return {
+			genres: genres,
+			nextCursor,
+		};
+	},
+	getGenres: async (condition = null) =>
 		condition === null ? await Genre.find() : await Genre.find(condition),
 
 	getGenreById: async (id) => await Genre.findById(id),
@@ -34,7 +92,7 @@ const mongoDataMethods = {
 		return await newGenre.save();
 	},
 
-	getAllUsers: async ({ limit = 100, cursor }) => {
+	getAllUsers: async ({ limit = 50, cursor }) => {
 		let filter = {};
 		if (cursor) {
 			filter = { _id: { $gt: cursor } }; // Lấy user có _id lớn hơn cursor
@@ -53,6 +111,9 @@ const mongoDataMethods = {
 		};
 	},
 
+	getUsers: async (condition = null) =>
+		condition === null ? await User.find() : await User.find(condition),
+
 	getUserById: async (id) => await User.findById(id),
 
 	createUser: async (args) => {
@@ -64,13 +125,13 @@ const mongoDataMethods = {
 		return await newUser.save();
 	},
 
-	updatedUser: async (id, args) => {
+	updateUser: async (id, args) => {
 		try {
-			const updatedUser = await User.findByIdAndUpdate(id, args, {
+			const updateUser = await User.findByIdAndUpdate(id, args, {
 				new: true,
 			});
-			if (!updatedUser) throw new Error('User not found');
-			return updatedUser;
+			if (!updateUser) throw new Error('User not found');
+			return updateUser;
 		} catch (error) {
 			console.error(error);
 			throw new Error(`Failed to update User with id: ${id}`);
@@ -220,10 +281,27 @@ const mongoDataMethods = {
 	},
 
 	// Transaction
-	getAllTransactions: async (condition = null) =>
-		condition === null
-			? await Transaction.find()
-			: await Transaction.find(condition),
+	getAllTransactions: async ({ limit = 50, cursor }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Fetch transactions where _id > cursor
+		}
+
+		const transactions = await Transaction.find(filter)
+			.sort({ _id: 1 }) // Sort in ascending order
+			.limit(limit)
+			.exec();
+
+		const nextCursor =
+			transactions.length > 0
+				? transactions[transactions.length - 1]._id
+				: null;
+
+		return {
+			transactions,
+			nextCursor,
+		};
+	},
 
 	getTransactionById: async (id) => await Transaction.findById(id),
 
@@ -231,7 +309,7 @@ const mongoDataMethods = {
 		if (Array.isArray(transaction)) {
 			return await Transaction.insertMany(transaction);
 		} else {
-			const newTransaction = new Genre(transaction);
+			const newTransaction = new Transaction(transaction);
 			return await newTransaction.save();
 		}
 	},
@@ -239,6 +317,46 @@ const mongoDataMethods = {
 	createTransaction: async (args) => {
 		const trans = new Transaction(args);
 		return await trans.save();
+	},
+
+	returnBookTransaction: async (transactionId) => {
+		try {
+			const transaction = await Transaction.findById(transactionId);
+			if (!transaction) throw new Error('Transaction not found');
+
+			const currentDate = new Date();
+
+			// If the book is already returned, no update needed
+			if (transaction.status === 'returned') {
+				throw new Error('Book is already returned');
+			}
+
+			// Update returnDate and determine if it's overdue
+			transaction.returnDate = currentDate;
+			transaction.status =
+				new Date(transaction.dueDate) < currentDate ? 'overdue' : 'returned';
+
+			await transaction.save();
+
+			// Convert UTC to Vietnam Time (ICT, UTC+7)
+			const toVietnamTime = (date) =>
+				date
+					? new Date(date.getTime() + 7 * 60 * 60 * 1000).toISOString()
+					: null;
+
+			const result = transaction.toObject();
+			return {
+				id: result._id.toString(),
+				userId: result.userId,
+				bookId: result.bookId,
+				borrowDate: toVietnamTime(result.borrowDate),
+				dueDate: toVietnamTime(result.dueDate),
+				returnDate: toVietnamTime(result.returnDate),
+				status: result.status,
+			};
+		} catch (error) {
+			throw new Error(error.message);
+		}
 	},
 
 	deleteTransaction: async (id) => {

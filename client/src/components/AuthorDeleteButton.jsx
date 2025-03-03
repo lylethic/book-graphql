@@ -20,7 +20,7 @@ export default function AuthorDeleteButton({ authorId, refetchAuthors }) {
 	};
 
 	return (
-		<Button variant='danger' onClick={handleDelete}>
+		<Button className='me-3' variant='danger' onClick={handleDelete}>
 			Delete
 		</Button>
 	);

@@ -16,7 +16,7 @@ export default function GenreSelectForm({ selectedGenre, onSelectedGenre }) {
 			onChange={(e) => onSelectedGenre(e.target.value)}
 		>
 			<option>Please select a genre...</option>
-			{data.genres.map((key) => (
+			{data.genres.genres.map((key) => (
 				<option value={key.id} key={key.id} className='text-capitalize'>
 					{key.name}
 				</option>

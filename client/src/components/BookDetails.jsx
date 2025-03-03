@@ -23,14 +23,14 @@ const BookDetails = ({ bookId, refetchBooks }) => {
 	const book = bookId !== null ? data.book : null;
 
 	return (
-		<Card bg='info' text='white' className='shadow'>
+		<Card text='black' className='shadow'>
 			<Card.Body>
 				{book === null ? (
 					<Card.Text>Please select a book</Card.Text>
 				) : (
 					<Fragment>
 						<Card.Title className='text-capitalize'>
-							Literary work: {book.name}
+							Title: {book.name}
 						</Card.Title>
 						<Card.Text className='text-capitalize'>
 							Genre: {book.genre.name}
@@ -41,16 +41,7 @@ const BookDetails = ({ bookId, refetchBooks }) => {
 						<Card.Text className='text-capitalize'>
 							Age: {book.author.age}
 						</Card.Text>
-						<Card.Text className='text-capitalize'>
-							All Books By this author:
-						</Card.Text>
-						<ul>
-							{book.author.books.map((book) => (
-								<li className='text-capitalize' key={book.id}>
-									{book.name}
-								</li>
-							))}
-						</ul>
+
 						<BookDeleteButton bookId={bookId} refetchBooks={refetchBooks} />
 						<UpdateBook
 							isDialogOpen={isOpen}

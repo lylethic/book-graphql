@@ -6,11 +6,32 @@ import AuthorDetails from './AuthorDetails';
 
 const AuthorList = () => {
 	const [authorSelected, setAuthorSelected] = useState(null);
-	const { loading, error, data, refetch } = useQuery(getAuthors);
-	console.log(data);
+	const { loading, error, data, refetch, fetchMore } = useQuery(getAuthors, {
+		variables: { limit: 5, cursor: null },
+	});
 
 	if (loading) return <p>Loading authors...</p>;
 	if (error) return <p>Error Loading authors...</p>;
+
+	// Function to load more authors
+	const loadMoreAuthors = () => {
+		fetchMore({
+			variables: { cursor: data.authors.nextCursor, limit: 5 },
+			updateQuery: (prevResult, { fetchMoreResult }) => {
+				if (!fetchMoreResult) return prevResult;
+
+				return {
+					authors: {
+						authors: [
+							...prevResult.authors.authors,
+							...fetchMoreResult.authors.authors,
+						], // Append new authors
+						nextCursor: fetchMoreResult.authors.nextCursor, // Update cursor
+					},
+				};
+			},
+		});
+	};
 
 	const handleAuthorDeleted = (deleteAuthorId) => {
 		if (authorSelected === deleteAuthorId) {
@@ -24,7 +45,7 @@ const AuthorList = () => {
 			<h4 className='my-2 text-capitalize'>authors</h4>
 			<Col xs={6}>
 				<Card className='d-flex flex-row flex-wrap text-left'>
-					{data.authors.map((author) => (
+					{data.authors.authors.map((author) => (
 						<Button
 							variant='outline-primary'
 							key={author.id}
@@ -37,6 +58,16 @@ const AuthorList = () => {
 						</Button>
 					))}
 				</Card>
+				{/* Pagination Button */}
+				{data.authors.nextCursor && (
+					<Button
+						onClick={loadMoreAuthors}
+						className='mt-3'
+						variant='secondary'
+					>
+						Load More
+					</Button>
+				)}
 			</Col>
 			<Col>
 				<AuthorDetails
