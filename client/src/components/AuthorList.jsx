@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/client';
 import { getAuthors } from '../graphql-client/queries';
 import { Card, Row, Col, CardGroup, Button } from 'react-bootstrap';
 import AuthorDetails from './AuthorDetails';
+import { MdKeyboardDoubleArrowRight } from 'react-icons/md';
 
 const AuthorList = () => {
 	const [authorSelected, setAuthorSelected] = useState(null);
@@ -25,7 +26,7 @@ const AuthorList = () => {
 						authors: [
 							...prevResult.authors.authors,
 							...fetchMoreResult.authors.authors,
-						], // Append new authors
+						],
 						nextCursor: fetchMoreResult.authors.nextCursor, // Update cursor
 					},
 				};
@@ -43,7 +44,7 @@ const AuthorList = () => {
 	return (
 		<Row className='my-4'>
 			<h4 className='my-2 text-capitalize'>authors</h4>
-			<Col xs={6}>
+			<Col xs={12} md={6} className='mb-lg-0 mb-3'>
 				<Card className='d-flex flex-row flex-wrap text-left'>
 					{data.authors.authors.map((author) => (
 						<Button
@@ -63,13 +64,13 @@ const AuthorList = () => {
 					<Button
 						onClick={loadMoreAuthors}
 						className='mt-3'
-						variant='secondary'
+						style={{ backgroundColor: '#6861ce', borderColor: '#6861ce' }}
 					>
-						Load More
+						Load More <MdKeyboardDoubleArrowRight />
 					</Button>
 				)}
 			</Col>
-			<Col>
+			<Col xs={12} md={6}>
 				<AuthorDetails
 					authorId={authorSelected}
 					refetchAuthors={handleAuthorDeleted}

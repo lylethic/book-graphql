@@ -1,12 +1,15 @@
 import { useMutation } from '@apollo/client';
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { deleteBook } from '../graphql-client/mutation';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 export default function BookDeleteButton({ bookId, refetchBooks }) {
+	const [showModal, setShowModal] = useState(false);
 	const [removeBook] = useMutation(deleteBook, {
 		onCompleted: () => {
 			refetchBooks(bookId);
+			setShowModal(false); // Close modal after success
 		},
 	});
 
@@ -20,8 +23,20 @@ export default function BookDeleteButton({ bookId, refetchBooks }) {
 	};
 
 	return (
-		<Button className='me-3' variant='danger' onClick={handleDelete}>
-			Delete
-		</Button>
+		<>
+			<Button
+				className='me-3'
+				variant='danger'
+				onClick={() => setShowModal(true)}
+			>
+				Delete
+			</Button>
+
+			<ConfirmDeleteModal
+				show={showModal}
+				handleClose={() => setShowModal(false)}
+				handleConfirm={handleDelete}
+			/>
+		</>
 	);
 }

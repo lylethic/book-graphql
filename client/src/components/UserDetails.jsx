@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { getSingleUser } from '../graphql-client/queries';
 import UserDeleteButton from './UserDeleteButton';
 import { Card } from 'react-bootstrap';
-import UpdateUser from './UpdateUser';
+import UpdateUserButton from './UpdateUserButton';
 
 const UserDetails = ({ userId, refetchUsers }) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +36,7 @@ const UserDetails = ({ userId, refetchUsers }) => {
 						<Card.Text className='text-capitalize'>Role: {user.role}</Card.Text>
 
 						<UserDeleteButton userId={userId} refetchUsers={refetchUsers} />
-						<UpdateUser
+						<UpdateUserButton
 							isDialogOpen={isOpen}
 							setIsDialogOpen={setIsOpen}
 							user={user}

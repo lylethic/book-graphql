@@ -17,7 +17,11 @@ export default function MainLayout() {
 		<main className='overflow-y-auto'>
 			<NavbarMenu />
 			<ApolloProvider client={client}>
-				<Container className='py-3 my-3 bg-primary-subtle'>
+				<Container
+					fluid={'xl'}
+					style={{ backgroundColor: '#f5f7fd' }}
+					className='rounded-5 p-5 my-3'
+				>
 					<h1 className='text-primary-emphasis text-capitalize text-center mb-3'>
 						my books
 					</h1>

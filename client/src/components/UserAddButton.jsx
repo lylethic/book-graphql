@@ -1,21 +1,20 @@
 import React from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
-import BookForm from './BookForm';
-import UserUpdateForm from './UserUpdateForm';
+import { Button, Modal } from 'react-bootstrap';
+import UserAddForm from './UserAddForm';
 
-export default function UpdateUser({
+export default function UserAddButton({
 	isDialogOpen,
 	setIsDialogOpen,
 	user,
-	refetchUsers,
+	refetch,
 }) {
 	const handleClose = () => setIsDialogOpen(false);
 	const handleShow = () => setIsDialogOpen(true);
 
 	return (
 		<>
-			<Button variant='primary' onClick={handleShow}>
-				Edit
+			<Button variant='primary' onClick={handleShow} className='rounded-5'>
+				Add new user
 			</Button>
 			<Modal
 				show={isDialogOpen}
@@ -24,10 +23,10 @@ export default function UpdateUser({
 				keyboard={false}
 			>
 				<Modal.Header closeButton>
-					<Modal.Title>Update User</Modal.Title>
+					<Modal.Title>Add new user</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<UserUpdateForm
+					<UserAddForm
 						user={user}
 						isDialogOpen={isDialogOpen}
 						setIsDialogOpen={setIsDialogOpen}

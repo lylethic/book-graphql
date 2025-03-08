@@ -26,16 +26,20 @@ const AuthorForm = () => {
 			variables: { name, age: parseInt(age) },
 			refetchQueries: [{ query: getAuthors }],
 		});
-		console.log(newAuthor);
+		// console.log(newAuthor);
 		setNewAuthor({ name: '', age: '' });
 	};
 
 	//GraphQL operations
-	const [addAuthor, dataMutation] = useMutation(addSingleAuthor);
+	const [addAuthor, dataMutation] = useMutation(addSingleAuthor, {
+		onCompleted: () => {
+			alert('Author added successfully!');
+			setNewAuthor({ name: '', age: '' });
+		},
+	});
 
 	return (
 		<Form>
-			<h4>Add new author</h4>
 			<Form.Group>
 				<Form.Control
 					className='mb-2'

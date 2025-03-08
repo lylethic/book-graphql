@@ -38,8 +38,13 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book }) => {
 	// GraphQL operations
 	const { loading, data } = useQuery(getAuthors);
 	const [addBook] = useMutation(addSingleBook, {
+		onCompleted: () => {
+			alert('Book added successfully!');
+			setBookData({ authorId: '', name: '', genre: '', id: '' });
+		},
 		refetchQueries: [{ query: getBooks }],
 	});
+
 	const [editBook] = useMutation(updateBook);
 
 	const onSubmit = async (e) => {
@@ -72,7 +77,6 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book }) => {
 
 	return (
 		<Form onSubmit={onSubmit}>
-			<h4>{book ? '' : 'Add New Book'}</h4>
 			{book && (
 				<Form.Group>
 					<Form.Control

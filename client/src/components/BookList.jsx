@@ -3,6 +3,7 @@ import { Card, Row, Col, CardGroup, Button } from 'react-bootstrap';
 import BookDetails from './BookDetails';
 import { useQuery } from '@apollo/client';
 import { getBooks } from '../graphql-client/queries';
+import { MdKeyboardDoubleArrowRight } from 'react-icons/md';
 
 const BookList = () => {
 	const [bookSelected, setBookSelected] = useState(null);
@@ -39,7 +40,7 @@ const BookList = () => {
 
 	return (
 		<Row>
-			<Col xs={6}>
+			<Col xs={12} md={6} className='mb-lg-0 mb-3'>
 				<h4 className='my-2 text-capitalize'>books</h4>
 				<Card className='d-flex flex-row flex-wrap text-left'>
 					{data.books.books.map((book) => (
@@ -57,12 +58,16 @@ const BookList = () => {
 				</Card>
 				{/* Pagination Button */}
 				{data.books.nextCursor && (
-					<Button onClick={loadMoreBooks} className='mt-3' variant='secondary'>
-						Load More
+					<Button
+						onClick={loadMoreBooks}
+						className='mt-3'
+						style={{ backgroundColor: '#6861ce', borderColor: '#6861ce' }}
+					>
+						Load More <MdKeyboardDoubleArrowRight />
 					</Button>
 				)}
 			</Col>
-			<Col>
+			<Col xs={12} md={6}>
 				<BookDetails bookId={bookSelected} refetchBooks={handleBookDeleted} />
 			</Col>
 		</Row>
