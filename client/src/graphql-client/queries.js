@@ -146,6 +146,273 @@ const getSingleTransaction = gql`
 	}
 `;
 
+const getSingleReservation = gql`
+	query ($reservationId: ID!) {
+		reservation(id: $reservationId) {
+			id
+			bookId {
+				name
+				author {
+					name
+				}
+			}
+			userId {
+				name
+			}
+			status
+			reservationDate
+		}
+	}
+`;
+
+const getAllReservations = gql`
+	query ($limit: Int, $cursor: ID) {
+		reservations(limit: $limit, cursor: $cursor) {
+			nextCursor
+			reservations {
+				id
+				bookId {
+					id
+					name
+					author {
+						name
+					}
+				}
+				userId {
+					id
+					name
+				}
+				status
+				reservationDate
+			}
+		}
+	}
+`;
+
+const getAllReservationsByUserAndBook = gql`
+	query ($bookId: ID!, $status: String, $limit: Int, $cursor: ID) {
+		getAllReservationsByUserAndBook(
+			bookId: $bookId
+			status: $status
+			limit: $limit
+			cursor: $cursor
+		) {
+			nextCursor
+			reservations {
+				id
+				userId {
+					id
+					name
+				}
+				bookId {
+					id
+					name
+					publisher {
+						name
+					}
+				}
+				reservationDate
+				status
+			}
+		}
+	}
+`;
+
+const getFine = gql`
+	query ($fineId: ID!) {
+		fine(id: $fineId) {
+			id
+			amount
+			issuedDate
+			status
+			userId {
+				id
+				name
+			}
+			transactionId {
+				bookId {
+					id
+					name
+					author {
+						id
+						name
+					}
+					genre {
+						id
+						name
+					}
+				}
+			}
+		}
+	}
+`;
+
+const getAllFines = gql`
+	query ($limit: Int, $cursor: ID) {
+		fines(limit: $limit, cursor: $cursor) {
+			nextCursor
+			fines {
+				id
+				amount
+				issuedDate
+				status
+				userId {
+					id
+					name
+				}
+				transactionId {
+					bookId {
+						id
+						name
+						author {
+							id
+							name
+						}
+						genre {
+							id
+							name
+						}
+					}
+				}
+			}
+		}
+	}
+`;
+
+// Review book
+const getCommentsByBookId = gql`
+	query ($bookId: ID!, $limit: Int) {
+		getCommentsByBookId(bookId: $bookId, limit: $limit) {
+			nextCursor
+			comments {
+				id
+				bookId {
+					id
+					name
+				}
+				userId {
+					id
+					name
+				}
+				comment
+			}
+		}
+	}
+`;
+
+const getAllFinesByUserId = gql`
+	query ($userId: ID!, $transactionId: ID, $limit: Int, $cursor: ID) {
+		getAllFinesByUserId(
+			userId: $userId
+			transactionId: $transactionId
+			limit: $limit
+			cursor: $cursor
+		) {
+			nextCursor
+			fines {
+				id
+				userId {
+					id
+					name
+				}
+				amount
+				issuedDate
+				transactionId {
+					id
+					borrowDate
+					dueDate
+					returnDate
+					bookId {
+						id
+						name
+					}
+				}
+			}
+		}
+	}
+`;
+
+const getSinglePublisher = gql`
+	query ($publisherId: ID!) {
+		publisher(id: $publisherId) {
+			data {
+				id
+				name
+				address
+				contact
+			}
+			message
+		}
+	}
+`;
+
+const getAllPublishers = gql`
+	query ($limit: Int, $cursor: ID) {
+		publishers(limit: $limit, cursor: $cursor) {
+			nextCursor
+			publishers {
+				id
+				name
+				address
+				contact
+			}
+		}
+	}
+`;
+
+const getSingleReview = gql`
+	query ($reviewId: ID!) {
+		review(id: $reviewId) {
+			id
+			userId {
+				id
+				name
+			}
+			bookId {
+				id
+				name
+				genre {
+					name
+				}
+				author {
+					name
+				}
+			}
+			rating
+			comment
+		}
+	}
+`;
+
+const getAllReviewsByBook = gql`
+	query ($bookId: ID!, $limit: Int) {
+		getCommentsByBookId(bookId: $bookId, limit: $limit) {
+			nextCursor
+			comments {
+				id
+				bookId {
+					id
+					name
+					genre {
+						name
+					}
+					author {
+						name
+					}
+					publisher {
+						name
+					}
+				}
+				userId {
+					id
+					name
+				}
+				comment
+			}
+		}
+	}
+`;
+
 export {
 	getBooks,
 	getSingleBook,
@@ -157,4 +424,15 @@ export {
 	getSingleUser,
 	getAllTransactions,
 	getSingleTransaction,
+	getSingleReservation,
+	getAllReservations,
+	getAllReservationsByUserAndBook,
+	getCommentsByBookId,
+	getAllFinesByUserId,
+	getFine,
+	getAllFines,
+	getSinglePublisher,
+	getAllPublishers,
+	getSingleReview,
+	getAllReviewsByBook,
 };

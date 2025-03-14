@@ -208,6 +208,299 @@ const returnBookTransation = gql`
 	}
 `;
 
+const addSinleReservation = gql`
+	mutation ($bookId: ID!, $userId: ID!, $status: String) {
+		createReservation(bookId: $bookId, userId: $userId, status: $status) {
+			id
+			bookId {
+				name
+				author {
+					name
+				}
+			}
+			userId {
+				name
+			}
+			reservationDate
+			status
+		}
+	}
+`;
+
+const updateReservation = gql`
+	mutation (
+		$updateReservationId: ID!
+		$bookId: ID
+		$userId: ID
+		$reservationDate: String
+		$status: String
+	) {
+		updateReservation(
+			id: $updateReservationId
+			bookId: $bookId
+			userId: $userId
+			reservationDate: $reservationDate
+			status: $status
+		) {
+			id
+			bookId {
+				name
+				author {
+					name
+				}
+			}
+			userId {
+				name
+			}
+			status
+			reservationDate
+		}
+	}
+`;
+
+const deleteSinleReservation = gql`
+	mutation ($deleteReservationId: ID!) {
+		deleteReservation(id: $deleteReservationId) {
+			id
+			userId {
+				name
+			}
+			bookId {
+				name
+				author {
+					name
+				}
+				genre {
+					name
+				}
+			}
+			reservationDate
+			status
+		}
+	}
+`;
+
+const deleteReservationsByCondition = gql`
+	mutation ($ids: [ID!]!) {
+		deleteReservationsByCondition(ids: $ids) {
+			success
+			message
+		}
+	}
+`;
+
+const addSingleFine = gql`
+	mutation (
+		$userId: ID!
+		$amount: Float
+		$transactionId: ID!
+		$status: String
+	) {
+		createFine(
+			userId: $userId
+			amount: $amount
+			transactionId: $transactionId
+			status: $status
+		) {
+			id
+			userId {
+				id
+				name
+			}
+			amount
+			issuedDate
+			status
+		}
+	}
+`;
+
+const updateFine = gql`
+	mutation (
+		$updateFineId: ID!
+		$amount: Float
+		$transactionId: ID
+		$userId: ID
+		$status: String
+	) {
+		updateFine(
+			id: $updateFineId
+			amount: $amount
+			transactionId: $transactionId
+			userId: $userId
+			status: $status
+		) {
+			id
+			userId {
+				id
+				name
+			}
+			transactionId {
+				bookId {
+					id
+					name
+				}
+				borrowDate
+				dueDate
+				returnDate
+				status
+			}
+			amount
+			status
+		}
+	}
+`;
+
+const deleteSingleFine = gql`
+	mutation ($deleteFineId: ID!) {
+		deleteFine(id: $deleteFineId) {
+			id
+			userId {
+				id
+				name
+			}
+			transactionId {
+				bookId {
+					id
+					name
+				}
+				borrowDate
+				dueDate
+				returnDate
+				status
+			}
+			amount
+			status
+		}
+	}
+`;
+
+const deleteFinesByCondition = gql`
+	mutation ($ids: [ID!]!) {
+		deleteFinesByCondition(ids: $ids) {
+			message
+			success
+		}
+	}
+`;
+
+const createPublisher = gql`
+	mutation ($publishers: [PublisherInput!]!) {
+		createPublishers(publishers: $publishers) {
+			id
+			name
+			address
+			contact
+		}
+	}
+`;
+
+const updatePublisher = gql`
+	mutation (
+		$updatePublisherId: ID!
+		$name: String
+		$address: String
+		$contact: String
+	) {
+		updatePublisher(
+			id: $updatePublisherId
+			name: $name
+			address: $address
+			contact: $contact
+		) {
+			id
+			name
+			address
+			contact
+		}
+	}
+`;
+
+const deleteSinlePublisher = gql`
+	mutation ($deletePublisherId: ID!) {
+		deletePublisher(id: $deletePublisherId) {
+			id
+			name
+			address
+			contact
+		}
+	}
+`;
+
+const deletePublishersByCondition = gql`
+	mutation ($ids: [ID!]!) {
+		deletePublishersByCondition(ids: $ids) {
+			message
+			success
+		}
+	}
+`;
+
+const addSingleReview = gql`
+	mutation ($userId: ID, $bookId: ID, $rating: Int, $comment: String) {
+		createReview(
+			bookId: $bookId
+			userId: $userId
+			rating: $rating
+			comment: $comment
+		) {
+			id
+			bookId {
+				name
+			}
+			userId {
+				name
+			}
+			rating
+			comment
+		}
+	}
+`;
+
+const updateReview = gql`
+	mutation (
+		$updateReviewId: ID!
+		$bookId: ID
+		$userId: ID
+		$comment: String
+		$rating: Int
+	) {
+		updateReview(
+			id: $updateReviewId
+			bookId: $bookId
+			userId: $userId
+			comment: $comment
+			rating: $rating
+		) {
+			id
+			bookId {
+				id
+				name
+				genre {
+					name
+				}
+				author {
+					name
+				}
+			}
+			userId {
+				id
+				name
+			}
+			rating
+			comment
+		}
+	}
+`;
+
+const deleteSingleReview = gql`
+	mutation ($ids: [ID!]!) {
+		deleteReviewsByCondition(ids: $ids) {
+			message
+			success
+		}
+	}
+`;
+
 export {
 	addSingleBook,
 	addSingleAuthor,
@@ -227,4 +520,17 @@ export {
 	transactionBorrow,
 	returnBookTransation,
 	updateUser,
+	addSinleReservation,
+	updateReservation,
+	deleteReservationsByCondition,
+	addSingleFine,
+	updateFine,
+	deleteSingleFine,
+	deleteFinesByCondition,
+	updatePublisher,
+	deleteSinlePublisher,
+	deletePublishersByCondition,
+	addSingleReview,
+	updateReview,
+	deleteSingleReview,
 };

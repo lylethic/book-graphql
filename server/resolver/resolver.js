@@ -39,6 +39,21 @@ const resolvers = {
 		reservation: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getReservation(id),
 
+		getAllReservationsByUserAndBook: async (
+			parent,
+			{ bookId, status, limit, cursor },
+			{ mongoDataMethods }
+		) => {
+			return await mongoDataMethods.getAllReservationsByUserAndBook(
+				bookId,
+				status,
+				{
+					limit,
+					cursor,
+				}
+			);
+		},
+
 		// Fine: tien phat
 		fines: async (parent, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getAllFines(args),
@@ -60,6 +75,7 @@ const resolvers = {
 		review: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getReview(id),
 
+		// review by book
 		getCommentsByBookId: async (
 			parent,
 			{ bookId, limit, cursor },
@@ -68,9 +84,13 @@ const resolvers = {
 
 		getAllFinesByUserId: async (
 			parent,
-			{ userId, limit, cursor },
+			{ userId, transactionId, limit, cursor },
 			{ mongoDataMethods }
-		) => await mongoDataMethods.getAllFinesByUserId(userId, { limit, cursor }),
+		) =>
+			await mongoDataMethods.getAllFinesByUserId(userId, transactionId, {
+				limit,
+				cursor,
+			}),
 	},
 
 	Book: {
@@ -264,7 +284,7 @@ const resolvers = {
 			{ id, userId, transactionId, amount, status },
 			{ mongoDataMethods }
 		) =>
-			await mongoDataMethods.updateUser(id, {
+			await mongoDataMethods.updateFine(id, {
 				userId,
 				transactionId,
 				amount,

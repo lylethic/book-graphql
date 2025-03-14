@@ -426,6 +426,35 @@ const mongoDataMethods = {
 
 	getReservation: async (id) => await Reservation.findById(id),
 
+	getAllReservationsByUserAndBook: async (
+		bookId,
+		status, // Optional
+		{ limit = 50, cursor }
+	) => {
+		let filter = {};
+
+		if (bookId) filter.bookId = bookId;
+		if (status) filter.status = status; // Only add status if it's provided
+
+		// Add cursor-based pagination
+		if (cursor) {
+			filter.reservationDate = { $lt: cursor };
+		}
+
+		const reserv = await Reservation.find(filter)
+			.sort({ reservationDate: -1 }) // Newest reservationDate first
+			.limit(limit)
+			.exec();
+
+		const nextCursor =
+			reserv.length > 0 ? reserv[reserv.length - 1].reservationDate : null;
+
+		return {
+			reservations: reserv,
+			nextCursor,
+		};
+	},
+
 	createReservation: async (args) => {
 		const { userId, bookId, status } = args;
 		if (!userId || !bookId) {
@@ -487,6 +516,7 @@ const mongoDataMethods = {
 	// fine
 	getAllFines: async ({ limit = 50, cursor }) => {
 		let filter = {};
+
 		if (cursor) {
 			filter = { _id: { $gt: cursor } }; // Lấy có _id lớn hơn cursor
 		}
@@ -504,23 +534,29 @@ const mongoDataMethods = {
 		};
 	},
 
-	getAllFinesByUserId: async (userId, { limit = 50, cursor }) => {
+	getAllFinesByUserId: async (
+		userId,
+		transactionId,
+		{ limit = 50, cursor }
+	) => {
 		try {
-			let filter = { userId }; // Filter by userId
+			let filter = {};
+			if (userId) filter.userId = userId;
+			if (transactionId) filter.transactionId = transactionId;
 
 			if (cursor) {
-				filter._id = { $gt: cursor }; // Paginate based on _id
+				filter = { _id: { $gt: cursor } }; // Lấy có _id lớn hơn cursor
 			}
 
-			const fines = await Fine.find(filter)
-				.sort({ _id: 1 }) // Sort ascending
+			const fine = await Fine.find(filter)
+				.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
 				.limit(limit)
 				.exec();
 
-			const nextCursor = fines.length > 0 ? fines[fines.length - 1]._id : null;
+			const nextCursor = fine.length > 0 ? fine[fine.length - 1]._id : null;
 
 			return {
-				fines,
+				fines: fine,
 				nextCursor,
 			};
 		} catch (error) {

@@ -183,7 +183,19 @@ const typeDefs = gql`
 
 		getCommentsByBookId(bookId: ID!, limit: Int, cursor: ID): PaginatedComments
 
-		getAllFinesByUserId(userId: ID!, limit: Int, cursor: ID): FinePage
+		getAllFinesByUserId(
+			userId: ID
+			transactionId: ID
+			limit: Int
+			cursor: ID
+		): FinePage
+
+		getAllReservationsByUserAndBook(
+			bookId: ID!
+			status: String
+			limit: Int
+			cursor: ID
+		): ReservationPage
 	}
 
 	type Mutation {
