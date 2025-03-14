@@ -6,6 +6,7 @@ const typeDefs = gql`
 		name: String
 		genre: Genre
 		author: Author
+		publisher: Publisher
 	}
 
 	type Author {
@@ -21,6 +22,14 @@ const typeDefs = gql`
 		description: String
 	}
 
+	type User {
+		id: ID!
+		name: String
+		email: String
+		password: String
+		role: String
+	}
+
 	type Transaction {
 		id: ID!
 		userId: User
@@ -31,22 +40,57 @@ const typeDefs = gql`
 		status: String!
 	}
 
+	type Reservation {
+		id: ID!
+		userId: User
+		bookId: Book
+		reservationDate: String
+		status: String
+	}
+
+	type Fine {
+		id: ID!
+		userId: User
+		transactionId: Transaction
+		amount: Float
+		status: String
+		issuedDate: String
+	}
+
+	type Publisher {
+		id: ID!
+		name: String
+		address: String
+		contact: String
+	}
+
+	type Review {
+		id: ID!
+		bookId: Book
+		userId: User
+		rating: Int
+		comment: String
+	}
+
 	type DeleteResponse {
 		success: Boolean
 		message: String
 	}
 
-	type User {
-		id: ID!
-		name: String
-		email: String
-		password: String
-		role: String
+	type PublisherResponse {
+		data: Publisher
+		message: String
 	}
 
 	input GenreInput {
 		name: String!
 		description: String
+	}
+
+	input PublisherInput {
+		name: String
+		address: String
+		contact: String
 	}
 
 	input TransactionInput {
@@ -83,18 +127,63 @@ const typeDefs = gql`
 		nextCursor: ID
 	}
 
+	type FinePage {
+		fines: [Fine!]!
+		nextCursor: ID
+	}
+
+	type ReviewPage {
+		reviews: [Review!]!
+		nextCursor: ID
+	}
+
+	type PublisherPage {
+		publishers: [Publisher!]!
+		nextCursor: ID
+	}
+
+	type PaginatedComments {
+		comments: [Review]
+		nextCursor: ID
+	}
+
+	type ReservationPage {
+		reservations: [Reservation!]!
+		nextCursor: ID
+	}
+
 	#ROOT TYPE
 	type Query {
 		books(limit: Int, cursor: ID): BookPage
 		book(id: ID!): Book
+
 		authors(limit: Int, cursor: ID): AuthorPage
 		author(id: ID!): Author
+
 		genres(limit: Int, cursor: ID): GenrePage
 		genre(id: ID!): Genre
-		transactions(limit: Int, cursor: ID): TransactionPage
-		transaction(id: ID!): Transaction
+
 		users(limit: Int, cursor: ID): UserPage
 		user(id: ID!): User
+
+		transactions(limit: Int, cursor: ID): TransactionPage
+		transaction(id: ID!): Transaction
+
+		reservations(limit: Int, cursor: ID): ReservationPage
+		reservation(id: ID!): Reservation
+
+		fine(id: ID!): Fine
+		fines(limit: Int, cursor: ID): FinePage
+
+		review(id: ID!): Review
+		reviews(limit: Int, cursor: ID): ReviewPage
+
+		publisher(id: ID!): PublisherResponse
+		publishers(limit: Int, cursor: ID): PublisherPage
+
+		getCommentsByBookId(bookId: ID!, limit: Int, cursor: ID): PaginatedComments
+
+		getAllFinesByUserId(userId: ID!, limit: Int, cursor: ID): FinePage
 	}
 
 	type Mutation {
@@ -103,7 +192,7 @@ const typeDefs = gql`
 		updateAuthor(id: ID!, name: String, age: Int): Author
 		deleteAuthorsByCondition(ids: [ID!]!): DeleteResponse
 
-		createBook(name: String, genre: ID!, authorId: ID!): Book
+		createBook(name: String, genre: ID!, authorId: ID!, publisherId: ID): Book
 		updateBook(id: ID!, name: String, genre: String, authorId: ID): Book
 		deleteBook(id: ID!): Book
 		deleteBooksByCondition(ids: [ID!]!): DeleteResponse
@@ -122,14 +211,18 @@ const typeDefs = gql`
 			returnDate: String
 			status: String!
 		): Transaction
+
 		createTransactions(trans: [TransactionInput]!): [Transaction]
+
 		returnBookTransaction(transactionId: ID!): Transaction!
+
 		updateTransaction(
 			id: ID!
 			userId: ID!
 			bookId: ID!
 			dueDate: String!
 		): Transaction
+
 		deleteTransaction(id: ID!): Transaction
 		deleteTransactionByCondition(ids: [ID!]!): DeleteResponse
 
@@ -141,6 +234,64 @@ const typeDefs = gql`
 		): User
 		updateUser(id: ID!, name: String, email: String, role: String): User
 		deleteUser(id: ID!): User
+
+		createReservation(userId: ID!, bookId: ID!, status: String): Reservation
+
+		updateReservation(
+			id: ID!
+			userId: ID
+			bookId: ID
+			reservationDate: String
+			status: String
+		): Reservation
+
+		deleteReservation(id: ID!): Reservation
+		deleteReservationsByCondition(ids: [ID!]!): DeleteResponse
+
+		createFine(
+			userId: ID!
+			transactionId: ID!
+			amount: Float
+			status: String
+		): Fine
+
+		updateFine(
+			id: ID!
+			userId: ID
+			transactionId: ID
+			amount: Float
+			status: String
+		): Fine
+
+		deleteFine(id: ID!): Fine
+		deleteFinesByCondition(ids: [ID!]!): DeleteResponse
+
+		createPublisher(name: String, address: String, contact: String): Publisher
+
+		createPublishers(publishers: [PublisherInput!]!): [Publisher]
+
+		updatePublisher(
+			id: ID!
+			name: String
+			address: String
+			contact: String
+		): Publisher
+
+		deletePublisher(id: ID!): Publisher
+		deletePublishersByCondition(ids: [ID!]!): DeleteResponse
+
+		createReview(userId: ID, bookId: ID, rating: Int, comment: String): Review
+
+		updateReview(
+			id: ID!
+			userId: ID
+			bookId: ID
+			rating: Int
+			comment: String
+		): Review
+
+		deleteReview(id: ID!): Review
+		deleteReviewsByCondition(ids: [ID!]!): DeleteResponse
 	}
 `;
 

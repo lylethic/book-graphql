@@ -3,6 +3,10 @@ const Author = require('../models/author');
 const Genre = require('../models/genre');
 const User = require('../models/user');
 const Transaction = require('../models/transaction');
+const Reservation = require('../models/reservation');
+const Review = require('../models/review');
+const Fine = require('../models/fine');
+const Publisher = require('../models/publisher');
 
 const mongoDataMethods = {
 	getAllBooks: async ({ limit = 50, cursor }) => {
@@ -19,7 +23,7 @@ const mongoDataMethods = {
 		const nextCursor = books.length > 0 ? books[books.length - 1]._id : null;
 
 		return {
-			books: books,
+			books,
 			nextCursor,
 		};
 	},
@@ -72,6 +76,7 @@ const mongoDataMethods = {
 			nextCursor,
 		};
 	},
+
 	getGenres: async (condition = null) =>
 		condition === null ? await Genre.find() : await Genre.find(condition),
 
@@ -125,7 +130,7 @@ const mongoDataMethods = {
 		return await newUser.save();
 	},
 
-	updateUser: async (id, args) => {
+	updateReservation: async (id, args) => {
 		try {
 			const updateUser = await User.findByIdAndUpdate(id, args, {
 				new: true,
@@ -298,7 +303,7 @@ const mongoDataMethods = {
 				: null;
 
 		return {
-			transactions,
+			transactions: transactions,
 			nextCursor,
 		};
 	},
@@ -396,6 +401,375 @@ const mongoDataMethods = {
 		} catch (error) {
 			console.error(error);
 			throw new Error(`Failed to update Transaction with id: ${id}`);
+		}
+	},
+
+	// Reservation
+	getAllReservations: async ({ limit = 50, cursor }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Lấy có _id lớn hơn cursor
+		}
+
+		const reserv = await Reservation.find(filter)
+			.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
+			.limit(limit)
+			.exec();
+
+		const nextCursor = reserv.length > 0 ? reserv[reserv.length - 1]._id : null;
+
+		return {
+			reservations: reserv,
+			nextCursor,
+		};
+	},
+
+	getReservation: async (id) => await Reservation.findById(id),
+
+	createReservation: async (args) => {
+		const { userId, bookId, status } = args;
+		if (!userId || !bookId) {
+			throw new Error(
+				'Both userId and bookId are required to create a reservation.'
+			);
+		}
+		try {
+			const newReservation = new Reservation(args);
+			return await newReservation.save();
+		} catch (error) {
+			throw new Error('Failed to create reservation: ' + error.message);
+		}
+	},
+
+	updateReservation: async (id, args) => {
+		try {
+			const update = await Reservation.findByIdAndUpdate(id, args, {
+				new: true,
+			})
+				.populate('bookId')
+				.populate('userId');
+
+			if (!update) throw new Error('Reservation not found');
+			return update;
+		} catch (error) {
+			console.error(error);
+			throw new Error(`Failed to update Reservation with id: ${id}`);
+		}
+	},
+
+	deleteReservation: async (id) => {
+		try {
+			const deleteReservation = await Reservation.findByIdAndDelete(id);
+			if (!deleteReservation) throw new Error('Reservation not found');
+			return deleteReservation;
+		} catch (error) {
+			console.error(error);
+			throw new Error('Failed to delete Reservation with id: ${id}');
+		}
+	},
+
+	deleteReservationsByCondition: async (ids) => {
+		try {
+			const result = await Reservation.deleteMany({ _id: { $in: ids } });
+			if (result.deletedCount === 0) {
+				throw new Error('No Reservations found matching the condition');
+			}
+			return {
+				success: true,
+				message: `${result.deletedCount} Reservations deleted successfully`,
+			};
+		} catch (error) {
+			console.error(error);
+			throw new Error('Failed to delete Reservations');
+		}
+	},
+
+	// fine
+	getAllFines: async ({ limit = 50, cursor }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Lấy có _id lớn hơn cursor
+		}
+
+		const fine = await Fine.find(filter)
+			.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
+			.limit(limit)
+			.exec();
+
+		const nextCursor = fine.length > 0 ? fine[fine.length - 1]._id : null;
+
+		return {
+			fines: fine,
+			nextCursor,
+		};
+	},
+
+	getAllFinesByUserId: async (userId, { limit = 50, cursor }) => {
+		try {
+			let filter = { userId }; // Filter by userId
+
+			if (cursor) {
+				filter._id = { $gt: cursor }; // Paginate based on _id
+			}
+
+			const fines = await Fine.find(filter)
+				.sort({ _id: 1 }) // Sort ascending
+				.limit(limit)
+				.exec();
+
+			const nextCursor = fines.length > 0 ? fines[fines.length - 1]._id : null;
+
+			return {
+				fines,
+				nextCursor,
+			};
+		} catch (error) {
+			console.error(error);
+			throw new Error(`Failed to fetch fines for userId: ${userId}`);
+		}
+	},
+
+	getFine: async (id) => await Fine.findById(id),
+
+	createFine: async (args) => {
+		const newFine = new Fine(args);
+		return await newFine.save();
+	},
+
+	updateFine: async (id, args) => {
+		try {
+			const update = await Fine.findByIdAndUpdate(id, args, {
+				new: true,
+			});
+			if (!update) throw new Error('Fine not found');
+			return update;
+		} catch (error) {
+			console.error(error);
+			throw new Error(`Failed to update Fine with id: ${id}`);
+		}
+	},
+
+	deleteFine: async (id) => {
+		try {
+			const deleteFine = await Fine.findByIdAndDelete(id);
+			if (!deleteFine) throw new Error('Fine not found');
+			return deleteFine;
+		} catch (error) {
+			console.error(error);
+			throw new Error('Failed to delete Fine with id: ${id}');
+		}
+	},
+
+	deleteFinesByCondition: async (ids) => {
+		try {
+			const result = await Fine.deleteMany({ _id: { $in: ids } });
+			if (result.deletedCount === 0) {
+				throw new Error('No Fines found matching the condition');
+			}
+			return {
+				success: true,
+				message: `${result.deletedCount} Fine deleted successfully`,
+			};
+		} catch (error) {
+			console.error(error);
+			throw new Error('Failed to delete Fines');
+		}
+	},
+
+	// Publisher
+	getAllPublishers: async ({ limit = 50, cursor }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Lấy có _id lớn hơn cursor
+		}
+
+		const publisher = await Publisher.find(filter)
+			.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
+			.limit(limit)
+			.exec();
+
+		const nextCursor =
+			publisher.length > 0 ? publisher[publisher.length - 1]._id : null;
+
+		return {
+			publishers: publisher,
+			nextCursor,
+		};
+	},
+
+	getPublisher: async (id) => {
+		try {
+			if (!id) {
+				return { data: null, message: 'Publisher ID is required' };
+			}
+
+			const publisher = await Publisher.findById(id);
+			if (!publisher) {
+				return { data: null, message: `Publisher with ID ${id} not found` };
+			}
+
+			return { data: publisher, message: null };
+		} catch (error) {
+			console.error(error);
+			return {
+				data: null,
+				message: `Error fetching publisher: ${error.message}`,
+			};
+		}
+	},
+
+	createPublisher: async (args) => {
+		const newPublisher = new Publisher(args);
+		return await newPublisher.save();
+	},
+
+	createPublishers: async (publishers) => {
+		try {
+			if (Array.isArray(publishers))
+				return await Publisher.insertMany(publishers);
+			else {
+				const data = Publisher(publishers);
+				return await data.save();
+			}
+		} catch (error) {
+			console.error('Error creating publishers:', error);
+			throw new Error(`Failed to create publishers: ${error.message}`);
+		}
+	},
+
+	createGenres: async (genres) => {
+		if (Array.isArray(genres)) {
+			return await Genre.insertMany(genres);
+		} else {
+			const newGenre = new Genre(genres);
+			return await newGenre.save();
+		}
+	},
+
+	updatePublisher: async (id, args) => {
+		try {
+			const update = await Publisher.findByIdAndUpdate(id, args, {
+				new: true,
+			});
+			if (!update) throw new Error('Publisher not found');
+			return update;
+		} catch (error) {
+			console.error(error);
+			throw new Error(`Failed to update Publisher with id: ${id}`);
+		}
+	},
+
+	deletePublisher: async (id) => {
+		try {
+			const deletePublisher = await Publisher.findByIdAndDelete(id);
+			if (!deletePublisher) throw new Error('Publisher not found');
+			return deletePublisher;
+		} catch (error) {
+			console.error(error);
+			throw new Error('Failed to delete Publisher with id: ${id}');
+		}
+	},
+
+	deletePublishersByCondition: async (ids) => {
+		try {
+			const result = await Publisher.deleteMany({ _id: { $in: ids } });
+			if (result.deletedCount === 0) {
+				throw new Error('No Publishers found matching the condition');
+			}
+			return {
+				success: true,
+				message: `${result.deletedCount} Publisher deleted successfully`,
+			};
+		} catch (error) {
+			console.error(error);
+			throw new Error('Failed to delete Publishers');
+		}
+	},
+
+	// Review
+	getAllReviews: async ({ limit = 50, cursor }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Lấy có _id lớn hơn cursor
+		}
+
+		const review = await Review.find(filter)
+			.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
+			.limit(limit)
+			.exec();
+
+		const nextCursor = review.length > 0 ? review[review.length - 1]._id : null;
+
+		return {
+			reviews: review,
+			nextCursor,
+		};
+	},
+
+	getReview: async (id) => await Review.findById(id),
+
+	getCommentsByBookId: async (bookId, { limit = 50, cursor }) => {
+		try {
+			let filter = { bookId };
+			if (cursor) {
+				filter = { _id: { $gt: cursor } }; // Lấy có _id lớn hơn cursor
+			}
+			const comments = await Review.find(filter)
+				.sort({ _id: 1 })
+				.limit(limit)
+				.exec();
+
+			const nextCursor =
+				comments.length > 0 ? comments[comments.length - 1]._id : null;
+
+			return { comments: comments, nextCursor };
+		} catch (error) {
+			console.error(error);
+		}
+	},
+
+	createReview: async (args) => {
+		const newReview = new Review(args);
+		return await newReview.save();
+	},
+
+	updateReview: async (id, args) => {
+		try {
+			const update = await Review.findByIdAndUpdate(id, args, {
+				new: true,
+			});
+			if (!update) throw new Error('Review not found');
+			return update;
+		} catch (error) {
+			console.error(error);
+			throw new Error(`Failed to update Review with id: ${id}`);
+		}
+	},
+
+	deleteReview: async (id) => {
+		try {
+			const deleteReview = await Review.findByIdAndDelete(id);
+			if (!deleteReview) throw new Error('Review not found');
+			return deleteReview;
+		} catch (error) {
+			console.error(error);
+			throw new Error('Failed to delete Review with id: ${id}');
+		}
+	},
+
+	deleteReviewsByCondition: async (ids) => {
+		try {
+			const result = await Review.deleteMany({ _id: { $in: ids } });
+			if (result.deletedCount === 0) {
+				throw new Error('No Reviews found matching the condition');
+			}
+			return {
+				success: true,
+				message: `${result.deletedCount} Reviews deleted successfully`,
+			};
+		} catch (error) {
+			console.error(error);
+			throw new Error('Failed to delete Reviews');
 		}
 	},
 };

@@ -11,6 +11,10 @@ const BookSchema = new Schema({
 	authorId: {
 		type: String,
 	},
+	publisherId: {
+		type: String,
+		default: null,
+	},
 });
 
 module.exports = mongoose.model('books', BookSchema);
