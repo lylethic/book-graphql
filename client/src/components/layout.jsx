@@ -6,6 +6,7 @@ import Forms from './Forms';
 import BookList from './BookList';
 import AuthorList from './AuthorList';
 import UserList from './UserList';
+import TransactionList from './transaction/transaction-list';
 
 export default function MainLayout() {
 	const client = new ApolloClient({
@@ -33,6 +34,8 @@ export default function MainLayout() {
 					<AuthorList />
 					<hr />
 					<UserList />
+					<hr />
+					<TransactionList />
 				</Container>
 			</ApolloProvider>
 		</main>

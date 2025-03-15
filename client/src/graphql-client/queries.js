@@ -112,6 +112,7 @@ const getAllTransactions = gql`
 				userId {
 					id
 					email
+					name
 				}
 				bookId {
 					id
