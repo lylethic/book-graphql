@@ -21,8 +21,13 @@ const resolvers = {
 		genre: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getGenreById(id),
 
-		transactions: async (parent, args, { mongoDataMethods }) =>
-			await mongoDataMethods.getAllTransactions(args),
+		transactions: async (parent, args, { mongoDataMethods }) => {
+			const { status, limit, cursor } = args;
+			return await mongoDataMethods.getAllTransactions(status, {
+				limit,
+				cursor,
+			});
+		},
 
 		transaction: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getTransactionById(id),
@@ -199,13 +204,15 @@ const resolvers = {
 			await mongoDataMethods.deleteGenre(id),
 
 		deleteGenresByCondition: async (parent, { ids }, { mongoDataMethods }) =>
-			await mongoDataMethods.deleteTransaction(ids),
+			await mongoDataMethods.deleteGenresByCondition(ids),
 
 		deleteUser: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.deleteUser(id),
 
-		deleteTransaction: async (parent, { id }, { mongoDataMethods }) =>
-			await mongoDataMethods.deleteGenre(id),
+		deleteTransaction: async (parent, { id }, { mongoDataMethods }) => {
+			const result = await mongoDataMethods.deleteTransaction(id);
+			return result;
+		},
 
 		deleteTransactionByCondition: async (
 			parent,

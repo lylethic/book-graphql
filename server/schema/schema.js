@@ -152,6 +152,10 @@ const typeDefs = gql`
 		nextCursor: ID
 	}
 
+	type DeleteResponseMessage {
+		message: String!
+	}
+
 	#ROOT TYPE
 	type Query {
 		books(limit: Int, cursor: ID): BookPage
@@ -166,7 +170,7 @@ const typeDefs = gql`
 		users(limit: Int, cursor: ID): UserPage
 		user(id: ID!): User
 
-		transactions(limit: Int, cursor: ID): TransactionPage
+		transactions(status: String, limit: Int, cursor: ID): TransactionPage
 		transaction(id: ID!): Transaction
 
 		reservations(limit: Int, cursor: ID): ReservationPage
@@ -235,7 +239,7 @@ const typeDefs = gql`
 			dueDate: String!
 		): Transaction
 
-		deleteTransaction(id: ID!): Transaction
+		deleteTransaction(id: ID!): DeleteResponseMessage
 		deleteTransactionByCondition(ids: [ID!]!): DeleteResponse
 
 		createUser(

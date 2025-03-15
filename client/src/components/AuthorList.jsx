@@ -62,9 +62,9 @@ const AuthorList = () => {
 				{/* Pagination Button */}
 				{data.authors.nextCursor && (
 					<Button
-						onClick={loadMoreAuthors}
 						className='mt-3'
 						style={{ backgroundColor: '#6861ce', borderColor: '#6861ce' }}
+						onClick={loadMoreAuthors}
 					>
 						Load More <MdKeyboardDoubleArrowRight />
 					</Button>

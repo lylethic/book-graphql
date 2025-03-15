@@ -286,14 +286,17 @@ const mongoDataMethods = {
 	},
 
 	// Transaction
-	getAllTransactions: async ({ limit = 50, cursor }) => {
+	getAllTransactions: async (status, { limit = 50, cursor }) => {
 		let filter = {};
+		if (status) {
+			filter.status = status;
+		}
 		if (cursor) {
-			filter = { _id: { $gt: cursor } }; // Fetch transactions where _id > cursor
+			filter._id = { $lt: cursor }; // Fetch transactions where _id > cursor
 		}
 
 		const transactions = await Transaction.find(filter)
-			.sort({ _id: 1 }) // Sort in ascending order
+			.sort({ _id: -1 }) // newest
 			.limit(limit)
 			.exec();
 
@@ -303,7 +306,7 @@ const mongoDataMethods = {
 				: null;
 
 		return {
-			transactions: transactions,
+			transactions,
 			nextCursor,
 		};
 	},
@@ -366,12 +369,21 @@ const mongoDataMethods = {
 
 	deleteTransaction: async (id) => {
 		try {
-			const deleteTrans = await Transaction.findByIdAndDelete(id);
-			if (!deleteTrans) throw new Error('Transaction not found');
-			return deleteTrans;
+			const findTransaction = await Transaction.findById(id);
+			if (!findTransaction) {
+				throw new Error(`Transaction not found with id: ${id}`);
+			}
+
+			const deleteTrans = await Transaction.deleteOne({ _id: id });
+
+			if (deleteTrans.deletedCount === 0) {
+				throw new Error(`Failed to delete transaction with id: ${id}`);
+			}
+
+			return { message: `Transaction with id: ${id} deleted successfully` };
 		} catch (error) {
 			console.error(error);
-			throw new Error('Failed to delete Transaction with id: ${id}');
+			throw new Error(`Failed to delete transaction with id: ${id}`);
 		}
 	},
 

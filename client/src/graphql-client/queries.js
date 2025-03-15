@@ -105,8 +105,9 @@ const getSingleUser = gql`
 `;
 
 const getAllTransactions = gql`
-	query ($limit: Int, $cursor: ID) {
-		transactions(limit: $limit, cursor: $cursor) {
+	query ($status: String, $limit: Int, $cursor: ID) {
+		transactions(status: $status, limit: $limit, cursor: $cursor) {
+			nextCursor
 			transactions {
 				id
 				userId {
@@ -122,7 +123,6 @@ const getAllTransactions = gql`
 				dueDate
 				status
 			}
-			nextCursor
 		}
 	}
 `;

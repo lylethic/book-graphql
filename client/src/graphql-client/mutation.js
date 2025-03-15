@@ -175,12 +175,32 @@ const updateUser = gql`
 	}
 `;
 
-const transactionBorrow = gql`
-	mutation ($trans: [TransactionInput]!) {
-		createTransactions(trans: $trans) {
+const createTransaction = gql`
+	mutation (
+		$userId: ID!
+		$bookId: ID!
+		$dueDate: String!
+		$borrowDate: String!
+		$returnDate: String
+		$status: String!
+	) {
+		createTransaction(
+			userId: $userId
+			bookId: $bookId
+			borrowDate: $borrowDate
+			dueDate: $dueDate
+			returnDate: $returnDate
+			status: $status
+		) {
 			id
-			userId
-			bookId
+			userId {
+				id
+				name
+			}
+			bookId {
+				id
+				name
+			}
 			dueDate
 			borrowDate
 			returnDate
@@ -204,6 +224,14 @@ const returnBookTransation = gql`
 			borrowDate
 			dueDate
 			status
+		}
+	}
+`;
+
+const deleteTransaction = gql`
+	mutation ($id: ID!) {
+		deleteTransaction(id: $id) {
+			message
 		}
 	}
 `;
@@ -517,8 +545,9 @@ export {
 	updateGenre,
 	createUser,
 	deleteUser,
-	transactionBorrow,
+	createTransaction,
 	returnBookTransation,
+	deleteTransaction,
 	updateUser,
 	addSinleReservation,
 	updateReservation,
@@ -527,6 +556,7 @@ export {
 	updateFine,
 	deleteSingleFine,
 	deleteFinesByCondition,
+	createPublisher,
 	updatePublisher,
 	deleteSinlePublisher,
 	deletePublishersByCondition,

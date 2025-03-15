@@ -31,7 +31,6 @@ export default function UserAddForm({ isDialogOpen, setIsDialogOpen, user }) {
 		setUser({ ...userData, [event.target.name]: event.target.value });
 	};
 
-	const { loading, data } = useQuery(getUsers);
 	const [addNewUser] = useMutation(createUser, {
 		onCompleted: () => {
 			alert('User added succesfully!');
