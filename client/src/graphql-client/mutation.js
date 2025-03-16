@@ -443,7 +443,7 @@ const updatePublisher = gql`
 	}
 `;
 
-const deleteSinlePublisher = gql`
+const deleteSinglePublisher = gql`
 	mutation ($deletePublisherId: ID!) {
 		deletePublisher(id: $deletePublisherId) {
 			id
@@ -558,7 +558,7 @@ export {
 	deleteFinesByCondition,
 	createPublisher,
 	updatePublisher,
-	deleteSinlePublisher,
+	deleteSinglePublisher,
 	deletePublishersByCondition,
 	addSingleReview,
 	updateReview,
