@@ -61,12 +61,12 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book }) => {
 				},
 			});
 			setIsDialogOpen(false);
-			console.log({
-				id: book.id,
-				name,
-				genre,
-				authorId,
-			});
+			// console.log({
+			// 	id: book.id,
+			// 	name,
+			// 	genre,
+			// 	authorId,
+			// });
 		} else {
 			await addBook({
 				variables: { name, genre, authorId },

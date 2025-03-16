@@ -121,6 +121,7 @@ const getAllTransactions = gql`
 				}
 				borrowDate
 				dueDate
+				returnDate
 				status
 			}
 		}
