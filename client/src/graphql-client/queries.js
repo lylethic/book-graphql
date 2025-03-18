@@ -121,6 +121,7 @@ const getAllTransactions = gql`
 				}
 				borrowDate
 				dueDate
+				returnDate
 				status
 			}
 		}
@@ -231,6 +232,7 @@ const getFine = gql`
 				name
 			}
 			transactionId {
+				id
 				bookId {
 					id
 					name

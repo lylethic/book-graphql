@@ -5,6 +5,8 @@ import { getAllTransactions } from '../../graphql-client/queries';
 import TransactionDetail from './transaction-detail';
 import TransactionDeleteButton from './transaction-delete-button';
 import AddTransactionButton from './add-transaction-button';
+import UpdateTransactionButton from './update-transaction-button';
+import FineAddButton from './fine-add-button';
 
 const TransactionsList = () => {
 	const [filterStatus, setFilterStatus] = useState('');
@@ -68,39 +70,62 @@ const TransactionsList = () => {
 					<option value='overdue'>Overdue</option>
 				</Form.Control>
 			</Form.Group>
-			<Table striped bordered hover>
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>User</th>
-						<th>Book</th>
-						<th>Borrow Date</th>
-						<th>Due Date</th>
-						<th>Status</th>
-						<th>Features</th>
-					</tr>
-				</thead>
-				<tbody>
-					{data.transactions &&
-						data.transactions.transactions.map((transaction) => (
-							<tr key={transaction.id}>
-								<td>{transaction.id}</td>
-								<td>{transaction.userId ? transaction.userId.name : 'N/A'}</td>
-								<td>{transaction.bookId.name}</td>
-								<td>{formatDate(transaction.borrowDate)}</td>
-								<td>{formatDate(transaction.dueDate)}</td>
-								<td>{transaction.status}</td>
-								<td className='flex align-items-center justify-content-between gap-2'>
-									<TransactionDetail transactionId={transaction.id} />
-									<TransactionDeleteButton
-										transactionId={transaction.id}
-										refetchData={refetch}
-									/>
-								</td>
-							</tr>
-						))}
-				</tbody>
-			</Table>
+			<div className='table-responsive-lg'>
+				<Table striped bordered hover>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>User</th>
+							<th>Book</th>
+							<th>Borrow Date</th>
+							<th>Due Date</th>
+							<th>Return Date</th>
+							<th>Status</th>
+							<th>Features</th>
+						</tr>
+					</thead>
+					<tbody>
+						{data.transactions &&
+							data.transactions.transactions.map((transaction) => (
+								<tr key={transaction.id}>
+									<td>{transaction.id}</td>
+									<td>
+										{transaction.userId ? transaction.userId.name : 'N/A'}
+									</td>
+									<td>{transaction.bookId.name}</td>
+									<td>{formatDate(transaction.borrowDate)}</td>
+									<td>{formatDate(transaction.dueDate)}</td>
+									<td>
+										{transaction.returnDate
+											? formatDate(transaction.returnDate)
+											: ''}
+									</td>
+									<td>{transaction.status}</td>
+									<td className='d-flex align-items-center flex-wrap gap-2'>
+										<TransactionDetail transactionId={transaction.id} />
+										<TransactionDeleteButton
+											transactionId={transaction.id}
+											refetchData={refetch}
+										/>
+										{!transaction.returnDate && (
+											<UpdateTransactionButton
+												transactionId={transaction.id}
+												refetchData={refetch}
+											/>
+										)}
+										{transaction.returnDate &&
+											transaction.status === 'overdue' && (
+												<FineAddButton
+													transactionId={transaction.id}
+													userId={transaction.userId.id}
+												/>
+											)}
+									</td>
+								</tr>
+							))}
+					</tbody>
+				</Table>
+			</div>
 			{data.transactions.nextCursor && (
 				<Button
 					className='mt-3'

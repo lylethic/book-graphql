@@ -344,14 +344,14 @@ const addSingleFine = gql`
 
 const updateFine = gql`
 	mutation (
-		$updateFineId: ID!
+		$fineId: ID!
 		$amount: Float
 		$transactionId: ID
 		$userId: ID
 		$status: String
 	) {
 		updateFine(
-			id: $updateFineId
+			id: $fineId
 			amount: $amount
 			transactionId: $transactionId
 			userId: $userId
@@ -379,8 +379,8 @@ const updateFine = gql`
 `;
 
 const deleteSingleFine = gql`
-	mutation ($deleteFineId: ID!) {
-		deleteFine(id: $deleteFineId) {
+	mutation ($fineId: ID!) {
+		deleteFine(id: $fineId) {
 			id
 			userId {
 				id

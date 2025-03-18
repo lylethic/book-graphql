@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { createTransaction } from '../../graphql-client/mutation';
@@ -8,7 +8,7 @@ import { Button, Form } from 'react-bootstrap';
 export default function UpsertTransaction({
 	isDialogOpen,
 	setIsDialogOpen,
-	data,
+	transaction,
 }) {
 	const {
 		register,
@@ -18,6 +18,7 @@ export default function UpsertTransaction({
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
+			id: '',
 			userId: '',
 			bookId: '',
 			dueDate: '',
@@ -32,16 +33,17 @@ export default function UpsertTransaction({
 		onCompleted: () => {
 			alert('Add new Transaction successfull!');
 		},
-
 		refetchQueries: [{ query: getAllTransactions }],
 	});
 
 	// Populate the form when editing (if `data` is provided)
 	useEffect(() => {
-		if (data) {
-			Object.keys(data).forEach((key) => setValue(key, data[key]));
+		if (transaction) {
+			Object.keys(transaction).forEach((key) =>
+				setValue(key, transaction[key])
+			);
 		}
-	}, [data, setValue]);
+	}, [transaction, setValue]);
 
 	const onSubmit = async (formData) => {
 		try {
@@ -132,7 +134,7 @@ export default function UpsertTransaction({
 				</Form.Control.Feedback>
 			</Form.Group>
 			<Button type='submit' variant='primary'>
-				Submit
+				{transaction ? 'Update' : 'Add'}
 			</Button>
 		</Form>
 	);

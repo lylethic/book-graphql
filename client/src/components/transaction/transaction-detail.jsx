@@ -1,32 +1,31 @@
-import { useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import React, { Fragment, useState } from 'react';
 import { getSingleTransaction } from '../../graphql-client/queries';
 import { Button, Card, Modal } from 'react-bootstrap';
 
-export default function TransactionDetail({ transactionId, refetch }) {
+export default function TransactionDetail({ transactionId }) {
 	const [isOpen, setIsOpen] = useState(false);
-	const { loading, error, data } = useQuery(getSingleTransaction, {
-		variables: {
-			transactionId,
-		},
-		skip: transactionId === null,
-	});
 
-	if (loading) return <p>Loading transaction details...</p>;
-	if (error) {
-		console.log(error.message);
-		return <p>Error Loading transaction details!</p>;
-	}
+	// Lazy query
+	const [fetchTransaction, { loading, error, data }] =
+		useLazyQuery(getSingleTransaction);
 
 	const handleClose = () => setIsOpen(false);
-	const handleShow = () => setIsOpen(true);
+
+	const handleShow = () => {
+		fetchTransaction({
+			variables: { transactionId },
+			fetchPolicy: 'network-only',
+		});
+		setIsOpen(true);
+	};
 
 	const formatDate = (timestamp) => {
 		const date = new Date(parseInt(timestamp, 10));
 		return date.toLocaleDateString();
 	};
 
-	const transaction = transactionId !== null ? data.transaction : null;
+	const transaction = data ? data.transaction : null;
 
 	return (
 		<div>
@@ -39,18 +38,19 @@ export default function TransactionDetail({ transactionId, refetch }) {
 					<Modal.Title>Transaction details</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
+					{loading && <p>Loading transaction details...</p>}
+					{error && <p>Error loading transaction details!</p>}
 					<Card text='black' className='shadow'>
 						<Card.Body>
 							{!transaction ? (
-								<Card.Text>Not found transaction</Card.Text>
+								<Card.Text>No transaction data available</Card.Text>
 							) : (
 								<Fragment>
 									<Card.Text className='fw-bold'>
-										Book: {transaction.bookId ? transaction.bookId.name : null}
+										Book: {transaction.bookId?.name || 'N/A'}
 									</Card.Text>
 									<Card.Text>
-										Borrower:{' '}
-										{transaction.userId ? transaction.userId.name : null}
+										Borrower: {transaction.userId?.name || 'N/A'}
 									</Card.Text>
 									<Card.Text>
 										Borrow date: {formatDate(transaction.borrowDate)}
@@ -59,9 +59,12 @@ export default function TransactionDetail({ transactionId, refetch }) {
 										Due date: {formatDate(transaction.dueDate)}
 									</Card.Text>
 									<Card.Text>
-										Return date: {formatDate(transaction.returnDate)}
+										Return date:{' '}
+										{transaction.returnDate
+											? formatDate(transaction.returnDate)
+											: 'Not Returned'}
 									</Card.Text>
-									<Card.Text>Status: {transaction.Status}</Card.Text>
+									<Card.Text>Status: {transaction.status}</Card.Text>
 								</Fragment>
 							)}
 						</Card.Body>
