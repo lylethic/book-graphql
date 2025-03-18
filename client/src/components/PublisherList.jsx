@@ -46,8 +46,8 @@ const PublisherList = () => {
 
 	return (
 		<Row>
+			<h4 className="my-2 text-capitalize">Publishers</h4>
 			<Col xs={12} md={6} className="mb-lg-0 mb-3">
-				<h4 className="my-2 text-capitalize">Publishers</h4>
 				<Card className="d-flex flex-row flex-wrap text-left">
 					{data.publishers.publishers.map((publisher) => (
 						<Button

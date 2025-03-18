@@ -36,7 +36,7 @@ const Forms = () => {
 
 			<Col xs={12} md={4}>
 				<PulishserAddButton
-					isDialogOpen={isOpenPublisher	}
+					isDialogOpen={isOpenPublisher}
 					setIsDialogOpen={setIsOpenPublisher}
 				/>
 			</Col>

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Card, Row, Col, CardGroup, Button } from 'react-bootstrap';
-import BookDetails from './BookDetails';
-import { useQuery } from '@apollo/client';
-import { getBooks } from '../graphql-client/queries';
-import { MdKeyboardDoubleArrowRight } from 'react-icons/md';
+import React, { useState } from "react";
+import { Card, Row, Col, CardGroup, Button } from "react-bootstrap";
+import BookDetails from "./BookDetails";
+import { useQuery } from "@apollo/client";
+import { getBooks } from "../graphql-client/queries";
+import { MdKeyboardDoubleArrowRight } from "react-icons/md";
 
-const BookList = () => {
+const BookList = ({ setSelectedBookId }) => {
 	const [bookSelected, setBookSelected] = useState(null);
 	const { loading, error, data, refetch, fetchMore } = useQuery(getBooks, {
 		variables: { limit: 5, cursor: null },
@@ -23,7 +23,10 @@ const BookList = () => {
 
 				return {
 					books: {
-						books: [...prevResult.books.books, ...fetchMoreResult.books.books], // Append new books
+						books: [
+							...prevResult.books.books,
+							...fetchMoreResult.books.books,
+						], // Append new books
 						nextCursor: fetchMoreResult.books.nextCursor, // Update cursor
 					},
 				};
@@ -40,18 +43,20 @@ const BookList = () => {
 
 	return (
 		<Row>
-			<Col xs={12} md={6} className='mb-lg-0 mb-3'>
-				<h4 className='my-2 text-capitalize'>books</h4>
-				<Card className='d-flex flex-row flex-wrap text-left'>
+			<h4 className="my-2 text-capitalize">books</h4>
+			<Col xs={12} md={6} className="mb-lg-0 mb-3">
+				<Card className="d-flex flex-row flex-wrap text-left">
 					{data.books.books.map((book) => (
 						<Button
-							variant='outline-primary'
+							variant="outline-primary"
 							key={book.id}
-							border='info'
-							text='info'
-							className='m-2 text-center shadow pointer text-capitalize'
-							onClick={setBookSelected.bind(this, book.id)}
-						>
+							border="info"
+							text="info"
+							className="m-2 text-center shadow pointer text-capitalize"
+							onClick={() => {
+								setBookSelected(book.id); // Cập nhật local state
+								setSelectedBookId(book.id); // Cập nhật state ở MainLayout
+							}}>
 							{book.name}
 						</Button>
 					))}
@@ -60,15 +65,20 @@ const BookList = () => {
 				{data.books.nextCursor && (
 					<Button
 						onClick={loadMoreBooks}
-						className='mt-3'
-						style={{ backgroundColor: '#6861ce', borderColor: '#6861ce' }}
-					>
+						className="mt-3"
+						style={{
+							backgroundColor: "#6861ce",
+							borderColor: "#6861ce",
+						}}>
 						Load More <MdKeyboardDoubleArrowRight />
 					</Button>
 				)}
 			</Col>
 			<Col xs={12} md={6}>
-				<BookDetails bookId={bookSelected} refetchBooks={handleBookDeleted} />
+				<BookDetails
+					bookId={bookSelected}
+					refetchBooks={handleBookDeleted}
+				/>
 			</Col>
 		</Row>
 	);
