@@ -232,6 +232,7 @@ const getFine = gql`
 				name
 			}
 			transactionId {
+				id
 				bookId {
 					id
 					name

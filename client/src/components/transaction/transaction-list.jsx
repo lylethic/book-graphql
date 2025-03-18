@@ -6,6 +6,7 @@ import TransactionDetail from './transaction-detail';
 import TransactionDeleteButton from './transaction-delete-button';
 import AddTransactionButton from './add-transaction-button';
 import UpdateTransactionButton from './update-transaction-button';
+import FineAddButton from './fine-add-button';
 
 const TransactionsList = () => {
 	const [filterStatus, setFilterStatus] = useState('');
@@ -106,12 +107,19 @@ const TransactionsList = () => {
 											transactionId={transaction.id}
 											refetchData={refetch}
 										/>
-										{transaction.returnDate && (
+										{!transaction.returnDate && (
 											<UpdateTransactionButton
 												transactionId={transaction.id}
 												refetchData={refetch}
 											/>
 										)}
+										{transaction.returnDate &&
+											transaction.status === 'overdue' && (
+												<FineAddButton
+													transactionId={transaction.id}
+													userId={transaction.userId.id}
+												/>
+											)}
 									</td>
 								</tr>
 							))}

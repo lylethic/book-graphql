@@ -580,8 +580,54 @@ const mongoDataMethods = {
 	getFine: async (id) => await Fine.findById(id),
 
 	createFine: async (args) => {
-		const newFine = new Fine(args);
-		return await newFine.save();
+		try {
+			const { userId, transactionId, amount, status } = args;
+
+			// Fetch transaction to validate overdue and calculate fine if needed
+			const transaction = await Transaction.findById(transactionId);
+			if (!transaction) {
+				throw new Error('Transaction not found');
+			}
+
+			// Ensure book is returned
+			if (!transaction.returnDate) {
+				throw new Error('Book has not been returned yet.');
+			}
+
+			// Check if fine already exists for this transaction
+			const existingFine = await Fine.findOne({ transactionId });
+			if (existingFine) {
+				throw new Error('Fine already exists for this transaction.');
+			}
+
+			// Calculate fine if not provided
+			let fineAmount = amount;
+			if (!fineAmount) {
+				if (transaction.returnDate > transaction.dueDate) {
+					const msPerDay = 24 * 60 * 60 * 1000;
+					const overdueDays = Math.ceil(
+						(transaction.returnDate - transaction.dueDate) / msPerDay
+					);
+					const finePerDay = 1;
+					fineAmount = overdueDays * finePerDay;
+				} else {
+					// Returned on time, no fine needed
+					throw new Error('Book returned on time. No fine needed.');
+				}
+			}
+
+			const newFine = new Fine({
+				userId,
+				transactionId,
+				amount: fineAmount,
+				status: status || 'unpaid',
+			});
+
+			const savedFine = await newFine.save();
+			return savedFine;
+		} catch (err) {
+			throw new Error(err.message);
+		}
 	},
 
 	updateFine: async (id, args) => {
