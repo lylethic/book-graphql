@@ -1,6 +1,6 @@
-import React from "react";
-import { Button, Modal } from "react-bootstrap";
-import ReviewForm from "./ReviewForm";
+import React from 'react';
+import { Button, Modal } from 'react-bootstrap';
+import ReviewForm from './ReviewForm';
 
 export default function ReviewAddButton({
 	isDialogOpen,
@@ -13,18 +13,16 @@ export default function ReviewAddButton({
 	const handleShow = () => setIsDialogOpen(true);
 
 	return (
-		<>
-			<Button
-				variant="success"
-				onClick={handleShow}
-				className="me-3 mx-3">
+		<div>
+			<Button variant='success' onClick={handleShow} className='me-3 mx-3'>
 				Add new review
 			</Button>
 			<Modal
 				show={isDialogOpen}
 				onHide={handleClose}
-				backdrop="static"
-				keyboard={false}>
+				backdrop='static'
+				keyboard={false}
+			>
 				<Modal.Header closeButton>
 					<Modal.Title>Add new Review</Modal.Title>
 				</Modal.Header>
@@ -38,6 +36,6 @@ export default function ReviewAddButton({
 					/>
 				</Modal.Body>
 			</Modal>
-		</>
+		</div>
 	);
 }

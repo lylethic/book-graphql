@@ -130,7 +130,7 @@ const mongoDataMethods = {
 		return await newUser.save();
 	},
 
-	updateReservation: async (id, args) => {
+	updateUser: async (id, args) => {
 		try {
 			const updateUser = await User.findByIdAndUpdate(id, args, {
 				new: true,

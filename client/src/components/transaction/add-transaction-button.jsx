@@ -9,7 +9,7 @@ export default function AddTransactionButton() {
 
 	return (
 		<div>
-			<Button variant='primary' onClick={handleShow} className='rounded-5'>
+			<Button variant='success' onClick={handleShow}>
 				Add new transaction
 			</Button>
 			<Modal

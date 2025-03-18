@@ -1,29 +1,24 @@
-import React from "react";
-import { Button, Modal } from "react-bootstrap";
-import PublisherForm from "./PublisherForm";
+import React, { useState } from 'react';
+import { Button, Modal } from 'react-bootstrap';
+import PublisherForm from './PublisherForm';
 
-export default function PublisherAddButton({
-	isDialogOpen,
-	setIsDialogOpen,
-	publisher,
-	refetch,
-}) {
+export default function PublisherAddButton({ publisher, refetch }) {
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 	const handleClose = () => setIsDialogOpen(false);
 	const handleShow = () => setIsDialogOpen(true);
 
 	return (
-		<>
-			<Button
-				variant="primary"
-				onClick={handleShow}
-				className="rounded-5">
+		<div>
+			<Button variant='success' onClick={handleShow}>
 				Add new publisher
 			</Button>
 			<Modal
 				show={isDialogOpen}
 				onHide={handleClose}
-				backdrop="static"
-				keyboard={false}>
+				backdrop='static'
+				keyboard={false}
+			>
 				<Modal.Header closeButton>
 					<Modal.Title>Add new Publisher</Modal.Title>
 				</Modal.Header>
@@ -35,6 +30,6 @@ export default function PublisherAddButton({
 					/>
 				</Modal.Body>
 			</Modal>
-		</>
+		</div>
 	);
 }

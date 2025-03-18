@@ -50,8 +50,10 @@ const TransactionsList = () => {
 
 	return (
 		<div>
-			<h4 className='my-2 text-capitalize'>transactions</h4>
-			<AddTransactionButton />
+			<div className='d-flex align-items-center justify-content-between my-2'>
+				<h4 className='my-2 text-capitalize'>transactions</h4>
+				<AddTransactionButton />
+			</div>
 			<Form.Group controlId='statusFilter' className='my-2'>
 				<Form.Label className='fst-italic fw-bold'>
 					Filter by Status:

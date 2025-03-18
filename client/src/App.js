@@ -1,12 +1,8 @@
-import AuthorList from "./components/AuthorList";
-import BookList from "./components/BookList";
-import Forms from "./components/Forms";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
-import { Container } from "react-bootstrap";
-import MainLayout from "./components/layout";
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import MainLayout from './components/layout';
 
 const client = new ApolloClient({
-	uri: "http://localhost:4000/graphql",
+	uri: 'http://localhost:4000/graphql',
 	cache: new InMemoryCache(),
 });
 

@@ -4,6 +4,7 @@ import { getAuthors } from '../graphql-client/queries';
 import { Card, Row, Col, CardGroup, Button } from 'react-bootstrap';
 import AuthorDetails from './AuthorDetails';
 import { MdKeyboardDoubleArrowRight } from 'react-icons/md';
+import AuthorAddButton from './AuthorAddButton';
 
 const AuthorList = () => {
 	const [authorSelected, setAuthorSelected] = useState(null);
@@ -43,7 +44,10 @@ const AuthorList = () => {
 
 	return (
 		<Row className='my-4'>
-			<h4 className='my-2 text-capitalize'>authors</h4>
+			<div className='d-flex align-items-center justify-content-between my-2'>
+				<h4 className='my-2 text-capitalize'>authors</h4>
+				<AuthorAddButton />
+			</div>
 			<Col xs={12} md={6} className='mb-lg-0 mb-3'>
 				<Card className='d-flex flex-row flex-wrap text-left'>
 					{data.authors.authors.map((author) => (

@@ -103,7 +103,7 @@ const UserUpdateForm = ({ isDialogOpen, setIsDialogOpen, user }) => {
 			</Form.Group>
 
 			<Button className='float-right' variant='primary' type='submit'>
-				{user ? 'Update Book' : 'Add Book'}
+				{user ? 'Update' : 'Add'}
 			</Button>
 		</Form>
 	);

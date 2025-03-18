@@ -1,19 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import BookForm from './BookForm';
 
-export default function BookAddButton({
-	isDialogOpen,
-	setIsDialogOpen,
-	book,
-	refetch,
-}) {
+export default function BookAddButton({ book, refetch }) {
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 	const handleClose = () => setIsDialogOpen(false);
 	const handleShow = () => setIsDialogOpen(true);
 
 	return (
 		<>
-			<Button variant='primary' onClick={handleShow} className='rounded-5'>
+			<Button variant='success' onClick={handleShow}>
 				Add new book
 			</Button>
 			<Modal
