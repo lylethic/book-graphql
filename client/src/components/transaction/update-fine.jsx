@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@apollo/client';
 import { getFine } from '../../graphql-client/queries';
 import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { updateFine } from '../../graphql-client/mutation';
+import { toast } from 'react-toastify';
 
 export default function UpdateFine({ fineId }) {
 	const {
@@ -34,10 +35,17 @@ export default function UpdateFine({ fineId }) {
 		}
 	}, [fineData, setValue]);
 
-	const [
-		updateFineMutation,
-		{ loading: mutationLoading, error: mutationError, data: mutationData },
-	] = useMutation(updateFine);
+	const [updateFineMutation, { loading: mutationLoading }] = useMutation(
+		updateFine,
+		{
+			onCompleted: () => {
+				toast.success('Updated successfull!');
+			},
+			onError: () => {
+				toast.error('Failed to update...');
+			},
+		}
+	);
 
 	const onSubmit = async (formData) => {
 		try {
@@ -56,15 +64,12 @@ export default function UpdateFine({ fineId }) {
 	};
 
 	if (queryLoading) return <Spinner animation='border' />;
-	if (queryError)
-		return (
-			<Alert variant='danger'>Error loading fine: {queryError.message}</Alert>
-		);
+	if (queryError) toast.error('Error loading fine... ');
 
 	return (
 		<Form
 			onSubmit={handleSubmit(onSubmit)}
-			className='p-4 border rounded shadow-sm'
+			className='border p-4 rounded shadow-sm'
 		>
 			<Form.Group className='mb-3'>
 				<Form.Label>Amount</Form.Label>
@@ -110,24 +115,14 @@ export default function UpdateFine({ fineId }) {
 				)}
 			</Form.Group>
 
-			<Button variant='primary' type='submit' disabled={mutationLoading}>
-				{mutationLoading ? (
-					<Spinner animation='border' size='sm' />
-				) : (
-					'Update Fine'
-				)}
+			<Button
+				className='d-flex align-items-center justify-content-center w-100 mt-4'
+				variant='primary'
+				type='submit'
+				disabled={mutationLoading}
+			>
+				{mutationLoading ? <Spinner animation='border' size='sm' /> : 'Update'}
 			</Button>
-
-			{mutationData && (
-				<Alert variant='success' className='mt-3'>
-					Fine updated successfully!
-				</Alert>
-			)}
-			{mutationError && (
-				<Alert variant='danger' className='mt-3'>
-					Error updating fine: {mutationError.message}
-				</Alert>
-			)}
 		</Form>
 	);
 }

@@ -86,8 +86,8 @@ const addGenres = gql`
 `;
 
 const updateGenre = gql`
-	mutation ($updateGenreId: ID!, $name: String, $description: String) {
-		updateGenre(id: $updateGenreId, name: $name, description: $description) {
+	mutation ($id: ID!, $name: String, $description: String) {
+		updateGenre(id: $id, name: $name, description: $description) {
 			id
 			name
 			description
@@ -96,8 +96,8 @@ const updateGenre = gql`
 `;
 
 const deleteGenre = gql`
-	mutation ($deleteGenreId: ID!) {
-		deleteGenre(id: $deleteGenreId) {
+	mutation ($id: ID!) {
+		deleteGenre(id: $id) {
 			id
 			name
 			description
@@ -203,6 +203,42 @@ const createTransaction = gql`
 			}
 			dueDate
 			borrowDate
+			returnDate
+			status
+		}
+	}
+`;
+
+const updateTransaction = gql`
+	mutation (
+		$id: ID!
+		$userId: ID!
+		$bookId: ID!
+		$dueDate: String
+		$borrowDate: String
+		$status: String
+		$returnDate: String
+	) {
+		updateTransaction(
+			id: $id
+			userId: $userId
+			bookId: $bookId
+			dueDate: $dueDate
+			borrowDate: $borrowDate
+			returnDate: $returnDate
+			status: $status
+		) {
+			id
+			userId {
+				id
+				name
+			}
+			bookId {
+				id
+				name
+			}
+			borrowDate
+			dueDate
 			returnDate
 			status
 		}
@@ -546,6 +582,7 @@ export {
 	createUser,
 	deleteUser,
 	createTransaction,
+	updateTransaction,
 	returnBookTransation,
 	deleteTransaction,
 	updateUser,

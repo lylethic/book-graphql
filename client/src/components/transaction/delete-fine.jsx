@@ -3,16 +3,18 @@ import React, { useState } from 'react';
 import { deleteSingleFine } from '../../graphql-client/mutation';
 import { Button } from 'react-bootstrap';
 import ConfirmDeleteModal from '../ConfirmDeleteModal';
+import { toast } from 'react-toastify';
 
 export default function DeleteFineButton({ fineId, refetchData }) {
 	const [showModal, setShowModal] = useState(false);
 	const [removeFine] = useMutation(deleteSingleFine, {
 		onCompleted: () => {
+			toast.success('Deleted successful!');
 			refetchData();
 			setShowModal(false);
 		},
 		onError: (error) => {
-			console.error('Failed to delete transaction:', error.message);
+			toast.error('Failed to delete transaction');
 		},
 	});
 

@@ -130,6 +130,19 @@ const mongoDataMethods = {
 		return await newUser.save();
 	},
 
+	createUser: async (args) => {
+		const existingUser = await User.findOne({ email: args.email });
+		if (existingUser) {
+			throw new Error('Email already exists');
+		}
+		if (Array.isArray(args)) {
+			return await User.insertMany(args);
+		} else {
+			const newUser = new User(args);
+			return await newUser.save();
+		}
+	},
+
 	updateUser: async (id, args) => {
 		try {
 			const updateUser = await User.findByIdAndUpdate(id, args, {

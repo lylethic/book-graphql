@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
 import { updateUser } from '../graphql-client/mutation';
 import { Form, Button } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 const UserUpdateForm = ({ isDialogOpen, setIsDialogOpen, user }) => {
 	const [userData, setUserData] = useState({
@@ -29,7 +30,11 @@ const UserUpdateForm = ({ isDialogOpen, setIsDialogOpen, user }) => {
 		setUserData({ ...userData, [event.target.name]: event.target.value });
 	};
 
-	const [editUser] = useMutation(updateUser);
+	const [editUser] = useMutation(updateUser, {
+		onCompleted: () => {
+			toast.success('Updated successful!');
+		},
+	});
 
 	const onSubmit = async (e) => {
 		e.preventDefault();

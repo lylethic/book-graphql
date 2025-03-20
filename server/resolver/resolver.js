@@ -156,8 +156,14 @@ const resolvers = {
 			return await mongoDataMethods.createGenres(genres);
 		},
 
-		createUser: async (parent, args, { mongoDataMethods }) =>
-			await mongoDataMethods.createUser(args),
+		createUser: async (parent, args, { mongoDataMethods }) => {
+			return await mongoDataMethods.createUser(args);
+		},
+
+		createUsers: async (parent, args, { mongoDataMethods }) => {
+			const { users } = args;
+			return await mongoDataMethods.createUsers(users);
+		},
 
 		createTransactions: async (parent, args, { mongoDataMethods }) => {
 			const { trans } = args;
@@ -169,6 +175,20 @@ const resolvers = {
 
 		returnBookTransaction: async (_, { transactionId }, { mongoDataMethods }) =>
 			await mongoDataMethods.returnBookTransaction(transactionId),
+
+		updateTransaction: async (
+			_,
+			{ id, userId, bookId, dueDate, borrowDate, returnDate, status },
+			{ mongoDataMethods }
+		) =>
+			await mongoDataMethods.updateTransaction(id, {
+				userId,
+				bookId,
+				dueDate,
+				borrowDate,
+				returnDate,
+				status,
+			}),
 
 		createReservation: async (parent, args, { mongoDataMethods }) => {
 			return await mongoDataMethods.createReservation(args);

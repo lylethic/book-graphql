@@ -4,6 +4,7 @@ import { getAuthors, getBooks } from '../graphql-client/queries';
 import { addSingleBook, updateBook } from '../graphql-client/mutation';
 import { Form, Button } from 'react-bootstrap';
 import GenreSelectForm from './genre-select-form';
+import { toast } from 'react-toastify';
 
 const BookForm = ({ isDialogOpen, setIsDialogOpen, book }) => {
 	const [bookData, setBookData] = useState({
@@ -39,8 +40,11 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book }) => {
 	const { loading, data } = useQuery(getAuthors);
 	const [addBook] = useMutation(addSingleBook, {
 		onCompleted: () => {
-			alert('Book added successfully!');
+			toast.success('Book added successfully!');
 			setBookData({ authorId: '', name: '', genre: '', id: '' });
+		},
+		onError: () => {
+			toast.error('Failed to create...');
 		},
 		refetchQueries: [{ query: getBooks }],
 	});

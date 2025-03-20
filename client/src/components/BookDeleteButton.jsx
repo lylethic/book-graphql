@@ -3,13 +3,18 @@ import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { deleteBook } from '../graphql-client/mutation';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
+import { toast } from 'react-toastify';
 
 export default function BookDeleteButton({ bookId, refetchBooks }) {
 	const [showModal, setShowModal] = useState(false);
 	const [removeBook] = useMutation(deleteBook, {
 		onCompleted: () => {
+			toast.success('Deleted successful!');
 			refetchBooks(bookId);
 			setShowModal(false); // Close modal after success
+		},
+		onError: () => {
+			toast.error('Failed to delete...');
 		},
 	});
 

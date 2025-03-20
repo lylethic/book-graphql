@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, Row, Col, CardGroup, Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Card, Row, Col, Button } from 'react-bootstrap';
 import BookDetails from './BookDetails';
 import { useQuery } from '@apollo/client';
 import { getBooks } from '../graphql-client/queries';
@@ -8,12 +8,22 @@ import BookAddButton from './BookAddButton';
 
 const BookList = ({ setSelectedBookId }) => {
 	const [bookSelected, setBookSelected] = useState(null);
-	const { loading, error, data, refetch, fetchMore } = useQuery(getBooks, {
-		variables: { limit: 5, cursor: null },
+	const [bookList, setBookList] = useState([]);
+
+	const { loading, error, data, fetchMore } = useQuery(getBooks, {
+		variables: { limit: 10, cursor: null },
 	});
 
-	if (loading) return <p>Loading books...</p>;
-	if (error) return <p>Error Loading books...</p>;
+	useEffect(() => {
+		if (data) {
+			setBookList((prev) => {
+				const newBooks = data.books.books.filter(
+					(ng) => !prev.some((pg) => pg.id === ng.id)
+				);
+				return [...prev, ...newBooks];
+			});
+		}
+	}, [data]);
 
 	// Function to load more books
 	const loadMoreBooks = () => {
@@ -36,27 +46,29 @@ const BookList = ({ setSelectedBookId }) => {
 		if (bookSelected === deletedBookId) {
 			setBookSelected(null);
 		}
-		refetch();
+		setBookList((prev) => prev.filter((g) => g.id !== deletedBookId));
 	};
+
+	if (loading) return <p>Loading books...</p>;
+	if (error) return <p>Error Loading books...</p>;
 
 	return (
 		<Row>
 			<div className='d-flex align-items-center justify-content-between my-2'>
-				<h4 className='my-2 text-capitalize'>books</h4>
+				<h4 className='text-capitalize my-2'>books</h4>
 				<BookAddButton />
 			</div>
-			<Col xs={12} md={6} className='mb-lg-0 mb-3'>
+			<Col xs={12} md={6} className='mb-3 mb-lg-0'>
 				<Card className='d-flex flex-row flex-wrap text-left'>
-					{data.books.books.map((book) => (
+					{bookList.map((book) => (
 						<Button
-							variant='outline-primary'
+							variant={bookSelected === book.id ? 'primary' : 'outline-primary'}
 							key={book.id}
 							border='info'
 							text='info'
-							className='m-2 text-center shadow pointer text-capitalize'
+							className='m-2 shadow text-capitalize text-center pointer'
 							onClick={() => {
-								setBookSelected(book.id); // Cập nhật local state
-								setSelectedBookId(book.id); // Cập nhật state ở MainLayout
+								setBookSelected(book.id);
 							}}
 						>
 							{book.name}

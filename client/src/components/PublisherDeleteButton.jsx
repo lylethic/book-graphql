@@ -1,15 +1,20 @@
-import { useMutation } from "@apollo/client";
-import React, { useState } from "react";
-import { Button } from "react-bootstrap";
-import { deleteSinglePublisher } from "../graphql-client/mutation";
-import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { useMutation } from '@apollo/client';
+import React, { useState } from 'react';
+import { Button } from 'react-bootstrap';
+import { deleteSinglePublisher } from '../graphql-client/mutation';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
+import { toast } from 'react-toastify';
 
 export default function BookDeleteButton({ publisherId, refetchPublishers }) {
 	const [showModal, setShowModal] = useState(false);
 	const [removePublisher] = useMutation(deleteSinglePublisher, {
 		onCompleted: () => {
+			toast.success('Deleted successful!');
 			refetchPublishers(publisherId);
-			setShowModal(false); // Close modal after success
+			setShowModal(false);
+		},
+		onError: () => {
+			toast.error('Failed to delete...');
 		},
 	});
 
@@ -18,18 +23,19 @@ export default function BookDeleteButton({ publisherId, refetchPublishers }) {
 			await removePublisher({
 				variables: { deletePublisherId: publisherId },
 			});
-			console.log("Publisher deleted successfully");
+			console.log('Publisher deleted successfully');
 		} catch (err) {
-			console.error("Error deleting publisher:", err.message);
+			console.error('Error deleting publisher:', err.message);
 		}
 	};
 
 	return (
 		<>
 			<Button
-				className="me-3"
-				variant="danger"
-				onClick={() => setShowModal(true)}>
+				className='me-3'
+				variant='danger'
+				onClick={() => setShowModal(true)}
+			>
 				Delete
 			</Button>
 

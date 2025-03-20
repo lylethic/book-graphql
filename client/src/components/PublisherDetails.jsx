@@ -1,9 +1,10 @@
-import React, { Fragment, useState } from "react";
-import { useQuery } from "@apollo/client";
-import { getSinglePublisher } from "../graphql-client/queries";
-import { Card } from "react-bootstrap";
-import PublisherDeleteButton from "./PublisherDeleteButton";
-import UpdatePublisher from "./PublisherUpdate";
+import React, { Fragment, useState } from 'react';
+import { useQuery } from '@apollo/client';
+import { getSinglePublisher } from '../graphql-client/queries';
+import { Card } from 'react-bootstrap';
+import PublisherDeleteButton from './PublisherDeleteButton';
+import UpdatePublisher from './PublisherUpdate';
+import { toast } from 'react-toastify';
 
 const PublisherDetails = ({ publisherId, refetchPublishers }) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -16,26 +17,26 @@ const PublisherDetails = ({ publisherId, refetchPublishers }) => {
 
 	if (loading) return <p>Loading publisher details...</p>;
 	if (error) {
-		console.error("GraphQL Error:", error.message);
+		toast.error('Error...');
 		return <p>Error Loading publisher details!</p>;
 	}
 
 	const publisher = data?.publisher?.data || null;
 
 	return (
-		<Card text="black" className="shadow">
+		<Card text='black' className='shadow'>
 			<Card.Body>
 				{!publisher ? (
 					<Card.Text>Please select a publisher</Card.Text>
 				) : (
 					<Fragment>
-						<Card.Title className="text-capitalize">
+						<Card.Title className='text-capitalize'>
 							Name: {publisher.name}
 						</Card.Title>
-						<Card.Text className="text-capitalize">
+						<Card.Text className='text-capitalize'>
 							Address: {publisher.address}
 						</Card.Text>
-						<Card.Text className="text-capitalize">
+						<Card.Text className='text-capitalize'>
 							Contact: {publisher.contact}
 						</Card.Text>
 

@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@apollo/client";
-import { getSinglePublisher } from "../graphql-client/queries";
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation } from '@apollo/client';
+import { getSinglePublisher } from '../graphql-client/queries';
 import {
 	createPublisher as addSinglePublisher,
 	updatePublisher,
-} from "../graphql-client/mutation";
-import { Form, Button } from "react-bootstrap";
+} from '../graphql-client/mutation';
+import { Form, Button } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 const PublisherForm = ({ isDialogOpen, setIsDialogOpen, publisher }) => {
 	const [publisherData, setPublisherData] = useState({
-		id: "",
-		name: "",
-		address: "",
-		contact: "",
+		id: '',
+		name: '',
+		address: '',
+		contact: '',
 	});
 
 	// Update form when a book is passed (edit mode)
@@ -20,9 +21,9 @@ const PublisherForm = ({ isDialogOpen, setIsDialogOpen, publisher }) => {
 		if (publisher) {
 			setPublisherData({
 				id: publisher.id,
-				name: publisher.name || "",
-				address: publisher.address || "",
-				contact: publisher.contact || "",
+				name: publisher.name || '',
+				address: publisher.address || '',
+				contact: publisher.contact || '',
 			});
 		}
 	}, [publisher]);
@@ -44,13 +45,23 @@ const PublisherForm = ({ isDialogOpen, setIsDialogOpen, publisher }) => {
 	// const { loading, data } = useQuery(getAuthors);
 	const [addPublisher] = useMutation(addSinglePublisher, {
 		onCompleted: () => {
-			alert("Publisher added successfully!");
-			setPublisherData({ contact: "", name: "", address: "", id: "" });
+			toast.success('Publisher added successfully!');
+			setPublisherData({ contact: '', name: '', address: '', id: '' });
+		},
+		onError: () => {
+			toast.error('Faild to add...');
 		},
 		refetchQueries: [{ query: getSinglePublisher }],
 	});
 
-	const [editPublisher] = useMutation(updatePublisher);
+	const [editPublisher] = useMutation(updatePublisher, {
+		onCompleted: () => {
+			toast.success('Publisher updated successfully!');
+		},
+		onError: () => {
+			toast.error('Faild to update...');
+		},
+	});
 
 	const onSubmit = async (e) => {
 		e.preventDefault();
@@ -79,7 +90,7 @@ const PublisherForm = ({ isDialogOpen, setIsDialogOpen, publisher }) => {
 				},
 			});
 		}
-		setPublisherData({ id: "", name: "", address: "", contact: "" });
+		setPublisherData({ id: '', name: '', address: '', contact: '' });
 	};
 
 	return (
@@ -87,10 +98,10 @@ const PublisherForm = ({ isDialogOpen, setIsDialogOpen, publisher }) => {
 			{publisher && (
 				<Form.Group>
 					<Form.Control
-						className="mb-2"
-						type="text"
-						placeholder="PublisherId..."
-						name="id"
+						className='mb-2'
+						type='text'
+						placeholder='PublisherId...'
+						name='id'
 						value={id}
 						onChange={onInputChange}
 						disabled
@@ -99,38 +110,42 @@ const PublisherForm = ({ isDialogOpen, setIsDialogOpen, publisher }) => {
 			)}
 			<Form.Group>
 				<Form.Control
-					className="mb-2"
-					type="text"
-					placeholder="Publisher name..."
-					name="name"
+					className='mb-2'
+					type='text'
+					placeholder='Publisher name...'
+					name='name'
 					value={name}
 					onChange={onInputChange}
 				/>
 			</Form.Group>
 
-			<Form.Group className="mb-2">
+			<Form.Group className='mb-2'>
 				<Form.Control
-					className="mb-2"
-					type="text"
-					placeholder="Address..."
-					name="address"
+					className='mb-2'
+					type='text'
+					placeholder='Address...'
+					name='address'
 					value={address}
 					onChange={onInputChange}
 				/>
 			</Form.Group>
-			<Form.Group className="mb-2">
+			<Form.Group className='mb-2'>
 				<Form.Control
-					className="mb-2"
-					type="text"
-					placeholder="Contact..."
-					name="contact"
+					className='mb-2'
+					type='text'
+					placeholder='Contact...'
+					name='contact'
 					value={contact}
 					onChange={onInputChange}
 				/>
 			</Form.Group>
 
-			<Button className="float-right" variant="primary" type="submit">
-				{publisher ? "Update Publisher" : "Add Publisher"}
+			<Button
+				className='d-flex align-items-center justify-content-center w-100 mb-2 mt-4'
+				variant='primary'
+				type='submit'
+			>
+				{publisher ? 'Update Publisher' : 'Add Publisher'}
 			</Button>
 		</Form>
 	);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { Table, Button, Form } from 'react-bootstrap';
+import { Table, Button, Form, Badge } from 'react-bootstrap';
 import { getAllTransactions } from '../../graphql-client/queries';
 import TransactionDetail from './transaction-detail';
 import TransactionDeleteButton from './transaction-delete-button';
@@ -51,7 +51,7 @@ const TransactionsList = () => {
 	return (
 		<div>
 			<div className='d-flex align-items-center justify-content-between my-2'>
-				<h4 className='my-2 text-capitalize'>transactions</h4>
+				<h4 className='text-capitalize my-2'>transactions</h4>
 				<AddTransactionButton />
 			</div>
 			<Form.Group controlId='statusFilter' className='my-2'>
@@ -102,8 +102,16 @@ const TransactionsList = () => {
 											? formatDate(transaction.returnDate)
 											: ''}
 									</td>
-									<td>{transaction.status}</td>
-									<td className='d-flex align-items-center flex-wrap gap-2'>
+									<td className='text-capitalize'>
+										<Badge
+											bg={
+												transaction.status === 'overdue' ? 'danger' : 'primary'
+											}
+										>
+											{transaction.status}
+										</Badge>
+									</td>
+									<td className='d-flex flex-wrap align-items-center gap-2'>
 										<TransactionDetail transactionId={transaction.id} />
 										<TransactionDeleteButton
 											transactionId={transaction.id}

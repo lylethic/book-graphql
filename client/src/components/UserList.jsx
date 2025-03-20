@@ -9,11 +9,8 @@ import UserAddButton from './UserAddButton';
 const UserList = () => {
 	const [userSelected, setUserSelected] = useState(null);
 	const { loading, error, data, refetch, fetchMore } = useQuery(getUsers, {
-		variables: { limit: 5, cursor: null },
+		variables: { limit: 10, cursor: null },
 	});
-
-	if (loading) return <p>Loading users...</p>;
-	if (error) return <p>Error Loading users...</p>;
 
 	// Function to load more books
 	const loadMore = () => {
@@ -39,21 +36,24 @@ const UserList = () => {
 		refetch();
 	};
 
+	if (loading) return <p>Loading users...</p>;
+	if (error) return <p>Error Loading users...</p>;
+
 	return (
 		<Row>
 			<div className='d-flex align-items-center justify-content-between my-2'>
-				<h4 className='my-2 text-capitalize'>users</h4>
+				<h4 className='text-capitalize my-2'>users</h4>
 				<UserAddButton />
 			</div>
-			<Col xs={12} md={6} className='mb-lg-0 mb-3'>
+			<Col xs={12} md={6} className='mb-3 mb-lg-0'>
 				<Card className='d-flex flex-row flex-wrap text-left'>
 					{data.users.users.map((user) => (
 						<Button
-							variant='outline-primary'
+							variant={userSelected !== user.id ? 'outline-primary' : 'primary'}
 							key={user.id}
 							border='info'
 							text='info'
-							className='m-2 text-center shadow pointer text-capitalize'
+							className='m-2 shadow text-capitalize text-center pointer'
 							onClick={setUserSelected.bind(this, user.id)}
 						>
 							{user.name}

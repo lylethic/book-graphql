@@ -1,9 +1,13 @@
 import { useMutation } from '@apollo/client';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { createTransaction } from '../../graphql-client/mutation';
+import {
+	createTransaction,
+	updateTransaction,
+} from '../../graphql-client/mutation';
 import { getAllTransactions } from '../../graphql-client/queries';
 import { Button, Form } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 export default function UpsertTransaction({
 	isDialogOpen,
@@ -36,28 +40,75 @@ export default function UpsertTransaction({
 		refetchQueries: [{ query: getAllTransactions }],
 	});
 
-	// Populate the form when editing (if `data` is provided)
+	const [editTransaction] = useMutation(updateTransaction, {
+		onCompleted: () => {
+			toast.success('Updated successfull!');
+		},
+		onError: () => {
+			toast.error('Can not update transaction...');
+		},
+	});
+
 	useEffect(() => {
 		if (transaction) {
-			Object.keys(transaction).forEach((key) =>
-				setValue(key, transaction[key])
-			);
+			// Handle regular fields
+			Object.keys(transaction).forEach((key) => {
+				// Handle nested userId and bookId as objects
+				if (key === 'userId' && transaction.userId?.id) {
+					setValue('userId', transaction.userId.id);
+				} else if (key === 'bookId' && transaction.bookId?.id) {
+					setValue('bookId', transaction.bookId.id);
+				}
+				// Handle date fields (convert from timestamp if necessary)
+				else if (
+					['borrowDate', 'dueDate', 'returnDate'].includes(key) &&
+					transaction[key]
+				) {
+					const date = new Date(parseInt(transaction[key]))
+						.toISOString()
+						.split('T')[0];
+					setValue(key, date); // Set in 'YYYY-MM-DD' format
+				}
+				// Handle other fields
+				else if (
+					!['userId', 'bookId', 'borrowDate', 'dueDate', 'returnDate'].includes(
+						key
+					)
+				) {
+					setValue(key, transaction[key]);
+				}
+			});
 		}
 	}, [transaction, setValue]);
 
 	const onSubmit = async (formData) => {
 		try {
-			await addNewTransaction({
-				variables: {
-					userId: formData.userId,
-					bookId: formData.bookId,
-					borrowDate: formData.borrowDate,
-					dueDate: formData.dueDate,
-					returnDate: formData.returnDate || null,
-					status: formData.status,
-				},
-			});
-			reset();
+			if (transaction) {
+				await editTransaction({
+					variables: {
+						id: formData.id,
+						userId: formData.userId,
+						bookId: formData.bookId,
+						borrowDate: formData.borrowDate,
+						dueDate: formData.dueDate,
+						returnDate: formData.returnDate || null,
+						status: formData.status,
+					},
+				});
+			} else {
+				await addNewTransaction({
+					variables: {
+						id: formData.id || null,
+						userId: formData.userId,
+						bookId: formData.bookId,
+						borrowDate: formData.borrowDate,
+						dueDate: formData.dueDate,
+						returnDate: formData.returnDate || null,
+						status: formData.status,
+					},
+				});
+				reset();
+			}
 		} catch (err) {
 			console.error('Error submitting transaction:', err);
 		}
@@ -133,7 +184,11 @@ export default function UpsertTransaction({
 					{errors.status?.message}
 				</Form.Control.Feedback>
 			</Form.Group>
-			<Button type='submit' variant='primary'>
+			<Button
+				className='d-flex align-items-center justify-content-center w-100 mt-4'
+				type='submit'
+				variant='primary'
+			>
 				{transaction ? 'Update' : 'Add'}
 			</Button>
 		</Form>

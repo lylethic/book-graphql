@@ -7,6 +7,8 @@ import TransactionList from './transaction/transaction-list';
 import PublisherList from './PublisherList';
 import FineList from './transaction/fine-list';
 import BookAndReview from './BookAndReview';
+import GenreList from './genre/genre-list';
+import BookList from './BookList';
 
 export default function MainLayout() {
 	return (
@@ -16,24 +18,31 @@ export default function MainLayout() {
 			<Container
 				fluid={'xl'}
 				style={{ backgroundColor: '#f5f7fd' }}
-				className='rounded-5 p-5 my-3'
+				className='p-5 rounded-5 my-3'
 			>
-				<h1 className='text-primary-emphasis text-capitalize text-center mb-3'>
+				<h1 className='text-capitalize text-center text-primary-emphasis mb-3'>
 					📚 My Books Collection
 				</h1>
 				<hr />
 
-				<BookAndReview />
+				{/* <BookAndReview /> */}
+				<Card className='p-4 shadow-sm mb-4'>
+					<BookList />
+				</Card>
 
-				<Card className='p-4 mb-4 shadow-sm'>
+				<Card className='p-4 shadow-sm mb-4'>
+					<GenreList />
+				</Card>
+
+				<Card className='p-4 shadow-sm mb-4'>
 					<AuthorList />
 				</Card>
 
-				<Card className='p-4 mb-4 shadow-sm'>
+				<Card className='p-4 shadow-sm mb-4'>
 					<UserList />
 				</Card>
 
-				<Card className='p-4 mb-4 shadow-sm'>
+				<Card className='p-4 shadow-sm mb-4'>
 					<TransactionList />
 				</Card>
 

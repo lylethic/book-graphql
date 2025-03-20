@@ -11,12 +11,9 @@ const PublisherList = () => {
 	const { loading, error, data, refetch, fetchMore } = useQuery(
 		getAllPublishers,
 		{
-			variables: { limit: 5, cursor: null },
+			variables: { limit: 10, cursor: null },
 		}
 	);
-
-	if (loading) return <p>Loading publishers...</p>;
-	if (error) return <p>Error Loading publishers...</p>;
 
 	// Function to load more books
 	const loadMorePublishers = () => {
@@ -45,21 +42,28 @@ const PublisherList = () => {
 		refetch();
 	};
 
+	if (loading) return <p>Loading publishers...</p>;
+	if (error) return <p>Error Loading publishers...</p>;
+
 	return (
 		<Row>
 			<div className='d-flex align-items-center justify-content-between my-2'>
-				<h4 className='my-2 text-capitalize'>Publishers</h4>
+				<h4 className='text-capitalize my-2'>Publishers</h4>
 				<PublisherAddButton />
 			</div>
-			<Col xs={12} md={6} className='mb-lg-0 mb-3'>
+			<Col xs={12} md={6} className='mb-3 mb-lg-0'>
 				<Card className='d-flex flex-row flex-wrap text-left'>
 					{data.publishers.publishers.map((publisher) => (
 						<Button
-							variant='outline-primary'
+							variant={
+								publisherSelected !== publisher.id
+									? 'outline-primary'
+									: 'primary'
+							}
 							key={publisher.id}
 							border='info'
 							text='info'
-							className='m-2 text-center shadow pointer text-capitalize'
+							className='m-2 shadow text-capitalize text-center pointer'
 							onClick={setPublisherSelected.bind(this, publisher.id)}
 						>
 							{publisher.name}

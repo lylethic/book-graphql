@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { getAuthors } from '../graphql-client/queries';
 import { Card, Row, Col, CardGroup, Button } from 'react-bootstrap';
@@ -8,12 +8,22 @@ import AuthorAddButton from './AuthorAddButton';
 
 const AuthorList = () => {
 	const [authorSelected, setAuthorSelected] = useState(null);
-	const { loading, error, data, refetch, fetchMore } = useQuery(getAuthors, {
-		variables: { limit: 5, cursor: null },
+	const [authorList, setAuthorList] = useState([]);
+
+	const { loading, error, data, fetchMore } = useQuery(getAuthors, {
+		variables: { limit: 10, cursor: null },
 	});
 
-	if (loading) return <p>Loading authors...</p>;
-	if (error) return <p>Error Loading authors...</p>;
+	useEffect(() => {
+		if (data) {
+			setAuthorList((prev) => {
+				const newAuthors = data.authors.authors.filter(
+					(ng) => !prev.some((pg) => pg.id === ng.id)
+				);
+				return [...prev, ...newAuthors];
+			});
+		}
+	}, [data]);
 
 	// Function to load more authors
 	const loadMoreAuthors = () => {
@@ -39,24 +49,29 @@ const AuthorList = () => {
 		if (authorSelected === deleteAuthorId) {
 			setAuthorSelected(null);
 		}
-		refetch();
+		setAuthorList((pre) => pre.filter((g) => g.id !== deleteAuthorId));
 	};
+
+	if (loading) return <p>Loading authors...</p>;
+	if (error) return <p>Error Loading authors...</p>;
 
 	return (
 		<Row className='my-4'>
 			<div className='d-flex align-items-center justify-content-between my-2'>
-				<h4 className='my-2 text-capitalize'>authors</h4>
+				<h4 className='text-capitalize my-2'>authors</h4>
 				<AuthorAddButton />
 			</div>
-			<Col xs={12} md={6} className='mb-lg-0 mb-3'>
+			<Col xs={12} md={6} className='mb-3 mb-lg-0'>
 				<Card className='d-flex flex-row flex-wrap text-left'>
-					{data.authors.authors.map((author) => (
+					{authorList.map((author) => (
 						<Button
-							variant='outline-primary'
+							variant={
+								authorSelected === author.id ? 'primary' : 'outline-primary'
+							}
 							key={author.id}
 							border='info'
 							text='info'
-							className='m-2 text-center shadow pointer'
+							className='m-2 shadow text-center pointer'
 							onClick={setAuthorSelected.bind(this, author.id)}
 						>
 							{author.name}

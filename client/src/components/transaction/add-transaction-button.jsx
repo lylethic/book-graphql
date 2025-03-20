@@ -19,7 +19,7 @@ export default function AddTransactionButton() {
 				keyboard={false}
 			>
 				<Modal.Header closeButton>
-					<Modal.Title>Add new user</Modal.Title>
+					<Modal.Title>Add new transaction</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
 					<UpsertTransaction

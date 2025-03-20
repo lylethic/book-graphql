@@ -3,13 +3,18 @@ import { useMutation } from '@apollo/client';
 import { Button } from 'react-bootstrap';
 import { deleteAuthor } from '../graphql-client/mutation';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
+import { toast } from 'react-toastify';
 
 export default function AuthorDeleteButton({ authorId, refetchAuthors }) {
 	const [showModal, setShowModal] = useState(false);
 
 	const [removeBook] = useMutation(deleteAuthor, {
 		onCompleted: () => {
+			toast.success('Deleted successful!');
 			refetchAuthors(authorId);
+		},
+		onError: () => {
+			toast.error('Failed to delete...');
 		},
 	});
 

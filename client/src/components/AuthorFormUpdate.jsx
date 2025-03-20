@@ -3,6 +3,7 @@ import { useMutation } from '@apollo/client';
 import { getAuthors } from '../graphql-client/queries';
 import { addSingleAuthor, updateAuthor } from '../graphql-client/mutation';
 import { Form, Button } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 const AuthorUpdateForm = ({ isDialogOpen, setIsDialogOpen, author }) => {
 	const [authorData, setAuthorData] = useState({
@@ -35,9 +36,22 @@ const AuthorUpdateForm = ({ isDialogOpen, setIsDialogOpen, author }) => {
 	};
 	// GraphQL operations
 	const [addAuthor] = useMutation(addSingleAuthor, {
+		onCompleted: () => {
+			toast.success('Created successful!');
+		},
+		onError: () => {
+			toast.error('Failed to add...');
+		},
 		refetchQueries: [{ query: getAuthors }],
 	});
-	const [editAuthor] = useMutation(updateAuthor);
+	const [editAuthor] = useMutation(updateAuthor, {
+		onCompleted: () => {
+			toast.success('Updated successful!');
+		},
+		onError: () => {
+			toast.error('Failed to Update...');
+		},
+	});
 
 	const onSubmit = async (e) => {
 		e.preventDefault();

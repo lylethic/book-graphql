@@ -30,6 +30,13 @@ const typeDefs = gql`
 		role: String
 	}
 
+	input UserInput {
+		name: String
+		email: String
+		password: String
+		role: String
+	}
+
 	type Transaction {
 		id: ID!
 		userId: User
@@ -236,7 +243,10 @@ const typeDefs = gql`
 			id: ID!
 			userId: ID!
 			bookId: ID!
-			dueDate: String!
+			dueDate: String
+			borrowDate: String
+			returnDate: String
+			status: String
 		): Transaction
 
 		deleteTransaction(id: ID!): DeleteResponseMessage
@@ -248,6 +258,7 @@ const typeDefs = gql`
 			password: String
 			role: String
 		): User
+		createUsers(users: [UserInput!]!): [User]
 		updateUser(id: ID!, name: String, email: String, role: String): User
 		deleteUser(id: ID!): User
 

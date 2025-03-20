@@ -4,6 +4,7 @@ import { Button, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { addSingleFine } from '../../graphql-client/mutation';
 import { getAllFines } from '../../graphql-client/queries';
+import { toast } from 'react-toastify';
 
 export default function FineAddForm({ transactionId, userId }) {
 	const {
@@ -27,9 +28,11 @@ export default function FineAddForm({ transactionId, userId }) {
 
 	const [addFine] = useMutation(addSingleFine, {
 		onCompleted: () => {
-			alert('Successfully created fine!');
+			toast.success('Successfully created fine!');
 		},
-		refetchQueries: [{ query: getAllFines }],
+		onError: () => {
+			toast.error('Failed to update...');
+		},
 	});
 
 	const onSubmit = async (formData) => {
@@ -90,8 +93,12 @@ export default function FineAddForm({ transactionId, userId }) {
 				</Form.Control.Feedback>
 			</Form.Group>
 
-			<Button type='submit' variant='primary'>
-				Create Fine
+			<Button
+				className='d-flex align-items-center justify-content-center w-100 mb-2 mt-4'
+				type='submit'
+				variant='primary'
+			>
+				Add
 			</Button>
 		</Form>
 	);
