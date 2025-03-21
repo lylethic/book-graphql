@@ -72,7 +72,7 @@ const TransactionsList = () => {
 					<option value='overdue'>Overdue</option>
 				</Form.Control>
 			</Form.Group>
-			<div className='table-responsive-lg'>
+			<div className='table-responsive'>
 				<Table striped bordered hover>
 					<thead>
 						<tr>
@@ -83,6 +83,10 @@ const TransactionsList = () => {
 							<th>Due Date</th>
 							<th>Return Date</th>
 							<th>Status</th>
+							<th>IsLateReturn</th>
+							<th>FineAmount</th>
+							<th>FineStatus</th>
+							<th>FineIssuedDate</th>
 							<th>Features</th>
 						</tr>
 					</thead>
@@ -111,6 +115,23 @@ const TransactionsList = () => {
 											{transaction.status}
 										</Badge>
 									</td>
+									<td>{transaction.isLateReturn}</td>
+									<td>{transaction.fineAmount}</td>
+									<td>
+										<Badge
+											bg={
+												transaction.fineStatus !== 'paid' ? 'danger' : 'success'
+											}
+										>
+											{transaction.fineStatus}
+										</Badge>
+									</td>
+									<td>
+										{transaction.fineIssuedDate
+											? formatDate(transaction.fineIssuedDate)
+											: ''}
+									</td>
+
 									<td className='d-flex flex-wrap align-items-center gap-2'>
 										<TransactionDetail transactionId={transaction.id} />
 										<TransactionDeleteButton
@@ -123,13 +144,6 @@ const TransactionsList = () => {
 												refetchData={refetch}
 											/>
 										)}
-										{transaction.returnDate &&
-											transaction.status === 'overdue' && (
-												<FineAddButton
-													transactionId={transaction.id}
-													userId={transaction.userId.id}
-												/>
-											)}
 									</td>
 								</tr>
 							))}

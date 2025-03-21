@@ -45,6 +45,10 @@ const typeDefs = gql`
 		dueDate: String!
 		returnDate: String
 		status: String!
+		isLateReturn: Boolean
+		fineAmount: Float
+		fineStatus: String
+		fineIssuedDate: String
 	}
 
 	type Reservation {
@@ -163,6 +167,22 @@ const typeDefs = gql`
 		message: String!
 	}
 
+	type TransactionWithFine {
+		id: ID!
+		userId: String
+		bookId: String
+		borrowDate: String
+		dueDate: String
+		returnDate: String
+		status: String
+		hasFine: Boolean!
+	}
+
+	type TransactionWithFineResult {
+		transactions: [TransactionWithFine!]!
+		nextCursor: ID
+	}
+
 	#ROOT TYPE
 	type Query {
 		books(limit: Int, cursor: ID): BookPage
@@ -207,6 +227,11 @@ const typeDefs = gql`
 			limit: Int
 			cursor: ID
 		): ReservationPage
+
+		getTransactionIsExistFine(
+			limit: Int
+			cursor: ID
+		): TransactionWithFineResult!
 	}
 
 	type Mutation {
@@ -233,6 +258,10 @@ const typeDefs = gql`
 			borrowDate: String!
 			returnDate: String
 			status: String!
+			isLateReturn: Boolean
+			fineAmount: Float
+			fineStatus: String
+			fineIssuedDate: String
 		): Transaction
 
 		createTransactions(trans: [TransactionInput]!): [Transaction]
@@ -247,6 +276,10 @@ const typeDefs = gql`
 			borrowDate: String
 			returnDate: String
 			status: String
+			isLateReturn: Boolean
+			fineAmount: Float
+			fineStatus: String
+			fineIssuedDate: String
 		): Transaction
 
 		deleteTransaction(id: ID!): DeleteResponseMessage

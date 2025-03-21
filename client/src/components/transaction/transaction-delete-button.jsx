@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
 import { deleteTransaction } from '../../graphql-client/mutation';
 import ConfirmDeleteModal from '../ConfirmDeleteModal';
+import { toast } from 'react-toastify';
 
 export default function TransactionDeleteButton({
 	transactionId,
@@ -11,18 +12,18 @@ export default function TransactionDeleteButton({
 	const [showModal, setShowModal] = useState(false);
 	const [removeTransaction] = useMutation(deleteTransaction, {
 		onCompleted: () => {
+			toast.success('Deleted succssful!');
 			refetchData();
 			setShowModal(false);
 		},
 		onError: (error) => {
-			console.error('Failed to delete transaction:', error.message);
+			toast.error('Failed to delete transaction');
 		},
 	});
 
 	const handleConfirm = async () => {
 		try {
 			await removeTransaction({ variables: { id: transactionId } });
-			console.log('Deleted successfully');
 		} catch (error) {
 			console.error('Error deleting transaction');
 		}

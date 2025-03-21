@@ -123,6 +123,10 @@ const getAllTransactions = gql`
 				dueDate
 				returnDate
 				status
+				isLateReturn
+				fineAmount
+				fineStatus
+				fineIssuedDate
 			}
 		}
 	}
@@ -144,6 +148,10 @@ const getSingleTransaction = gql`
 			dueDate
 			returnDate
 			status
+			isLateReturn
+			fineAmount
+			fineStatus
+			fineIssuedDate
 		}
 	}
 `;
@@ -264,6 +272,7 @@ const getAllFines = gql`
 					name
 				}
 				transactionId {
+					id
 					bookId {
 						id
 						name

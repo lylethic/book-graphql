@@ -354,8 +354,26 @@ const mongoDataMethods = {
 
 			// Update returnDate and determine if it's overdue
 			transaction.returnDate = currentDate;
-			transaction.status =
-				new Date(transaction.dueDate) < currentDate ? 'overdue' : 'returned';
+
+			const isLate = new Date(transaction.dueDate) < currentDate;
+			transaction.status = isLate ? 'overdue' : 'returned';
+			transaction.isLateReturn = isLate;
+
+			if (isLate) {
+				// Fine calculation logic (example: $1 per day late)
+				const msPerDay = 1000 * 60 * 60 * 24;
+				const daysLate = Math.ceil(
+					(currentDate - new Date(transaction.dueDate)) / msPerDay
+				);
+				const finePerDay = 1; // Define your fine rate per day
+				transaction.fineAmount = daysLate * finePerDay;
+				transaction.fineStatus = 'unpaid';
+				transaction.fineIssuedDate = currentDate;
+			} else {
+				transaction.fineAmount = 0;
+				transaction.fineStatus = 'none';
+				transaction.fineIssuedDate = null;
+			}
 
 			await transaction.save();
 
@@ -374,6 +392,10 @@ const mongoDataMethods = {
 				dueDate: toVietnamTime(result.dueDate),
 				returnDate: toVietnamTime(result.returnDate),
 				status: result.status,
+				isLateReturn: result.isLateReturn,
+				fineAmount: result.fineAmount,
+				fineStatus: result.fineStatus,
+				fineIssuedDate: toVietnamTime(result.fineIssuedDate),
 			};
 		} catch (error) {
 			throw new Error(error.message);
@@ -587,6 +609,74 @@ const mongoDataMethods = {
 		} catch (error) {
 			console.error(error);
 			throw new Error(`Failed to fetch fines for userId: ${userId}`);
+		}
+	},
+
+	getTransactionIsExistFine: async ({ limit = 10, cursor }) => {
+		try {
+			const aggregationPipeline = [
+				{
+					$match: {
+						status: 'overdue',
+						returnDate: { $ne: null },
+					},
+				},
+				{
+					$addFields: {
+						id: '$_id',
+						isLate: { $gt: ['$returnDate', '$dueDate'] },
+					},
+				},
+				{
+					$match: {
+						isLate: true,
+					},
+				},
+				{
+					$lookup: {
+						from: 'fines', // collection name in MongoDB
+						localField: '_id',
+						foreignField: 'transactionId',
+						as: 'fine',
+					},
+				},
+				{
+					$addFields: {
+						hasFine: { $gt: [{ $size: '$fine' }, 0] },
+					},
+				},
+				{
+					$project: {
+						_id: 0,
+						id: 1,
+						userId: 1,
+						bookId: 1,
+						borrowDate: 1,
+						dueDate: 1,
+						returnDate: 1,
+						status: 1,
+						hasFine: 1,
+					},
+				},
+				{ $sort: { _id: 1 } },
+				...(cursor
+					? [{ $match: { _id: { $gt: mongoose.Types.ObjectId(cursor) } } }]
+					: []),
+				{ $limit: limit },
+			];
+
+			const transactions = await Transaction.aggregate(aggregationPipeline);
+
+			return {
+				transactions: transactions || [], // Fallback to empty array
+				nextCursor:
+					transactions.length > 0
+						? transactions[transactions.length - 1]._id
+						: null,
+			};
+		} catch (error) {
+			console.error(error);
+			throw new Error('Failed to get transactions with fine existence.');
 		}
 	},
 

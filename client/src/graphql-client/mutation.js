@@ -218,6 +218,10 @@ const updateTransaction = gql`
 		$borrowDate: String
 		$status: String
 		$returnDate: String
+		$isLateReturn: Boolean
+		$fineAmount: Float
+		$fineStatus: String
+		$fineIssuedDate: String
 	) {
 		updateTransaction(
 			id: $id
@@ -227,6 +231,10 @@ const updateTransaction = gql`
 			borrowDate: $borrowDate
 			returnDate: $returnDate
 			status: $status
+			isLateReturn: $isLateReturn
+			fineAmount: $fineAmount
+			fineStatus: $fineStatus
+			fineIssuedDate: $fineIssuedDate
 		) {
 			id
 			userId {
@@ -241,6 +249,10 @@ const updateTransaction = gql`
 			dueDate
 			returnDate
 			status
+			isLateReturn
+			fineAmount
+			fineStatus
+			fineIssuedDate
 		}
 	}
 `;

@@ -16,7 +16,7 @@ export default function MainLayout() {
 			<NavbarMenu />
 
 			<Container
-				fluid={'xl'}
+				fluid
 				style={{ backgroundColor: '#f5f7fd' }}
 				className='p-5 rounded-5 my-3'
 			>

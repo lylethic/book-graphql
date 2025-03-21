@@ -29,13 +29,21 @@ export default function UpsertTransaction({
 			borrowDate: '',
 			returnDate: '',
 			status: '',
+			status: '',
+			isLateReturn: false,
+			fineAmount: 0,
+			fineStatus: '',
+			fineIssuedDate: '',
 		},
 		criteriaMode: 'all',
 	});
 
 	const [addNewTransaction] = useMutation(createTransaction, {
 		onCompleted: () => {
-			alert('Add new Transaction successfull!');
+			toast.success('Add new Transaction successfull!');
+		},
+		onError: () => {
+			toast.error('Can not add transaction...');
 		},
 		refetchQueries: [{ query: getAllTransactions }],
 	});
@@ -51,30 +59,22 @@ export default function UpsertTransaction({
 
 	useEffect(() => {
 		if (transaction) {
-			// Handle regular fields
 			Object.keys(transaction).forEach((key) => {
-				// Handle nested userId and bookId as objects
 				if (key === 'userId' && transaction.userId?.id) {
 					setValue('userId', transaction.userId.id);
 				} else if (key === 'bookId' && transaction.bookId?.id) {
 					setValue('bookId', transaction.bookId.id);
-				}
-				// Handle date fields (convert from timestamp if necessary)
-				else if (
-					['borrowDate', 'dueDate', 'returnDate'].includes(key) &&
+				} else if (
+					['borrowDate', 'dueDate', 'returnDate', 'fineIssuedDate'].includes(
+						key
+					) &&
 					transaction[key]
 				) {
 					const date = new Date(parseInt(transaction[key]))
 						.toISOString()
 						.split('T')[0];
-					setValue(key, date); // Set in 'YYYY-MM-DD' format
-				}
-				// Handle other fields
-				else if (
-					!['userId', 'bookId', 'borrowDate', 'dueDate', 'returnDate'].includes(
-						key
-					)
-				) {
+					setValue(key, date);
+				} else {
 					setValue(key, transaction[key]);
 				}
 			});
@@ -83,30 +83,24 @@ export default function UpsertTransaction({
 
 	const onSubmit = async (formData) => {
 		try {
+			const payload = {
+				id: formData.id,
+				userId: formData.userId,
+				bookId: formData.bookId,
+				borrowDate: formData.borrowDate,
+				dueDate: formData.dueDate,
+				returnDate: formData.returnDate || null,
+				status: formData.status,
+				isLateReturn: formData.isLateReturn,
+				fineAmount: parseFloat(formData.fineAmount),
+				fineStatus: formData.fineStatus,
+				fineIssuedDate: formData.fineIssuedDate || null,
+			};
+
 			if (transaction) {
-				await editTransaction({
-					variables: {
-						id: formData.id,
-						userId: formData.userId,
-						bookId: formData.bookId,
-						borrowDate: formData.borrowDate,
-						dueDate: formData.dueDate,
-						returnDate: formData.returnDate || null,
-						status: formData.status,
-					},
-				});
+				await editTransaction({ variables: payload });
 			} else {
-				await addNewTransaction({
-					variables: {
-						id: formData.id || null,
-						userId: formData.userId,
-						bookId: formData.bookId,
-						borrowDate: formData.borrowDate,
-						dueDate: formData.dueDate,
-						returnDate: formData.returnDate || null,
-						status: formData.status,
-					},
-				});
+				await addNewTransaction({ variables: payload });
 				reset();
 			}
 		} catch (err) {
@@ -184,6 +178,34 @@ export default function UpsertTransaction({
 					{errors.status?.message}
 				</Form.Control.Feedback>
 			</Form.Group>
+
+			<Form.Group className='mb-3'>
+				<Form.Label>Is Late Return</Form.Label>
+				<Form.Select {...register('isLateReturn')}>
+					<option value='false'>No</option>
+					<option value='true'>Yes</option>
+				</Form.Select>
+			</Form.Group>
+
+			<Form.Group className='mb-3'>
+				<Form.Label>Fine Amount</Form.Label>
+				<Form.Control type='number' step='0.01' {...register('fineAmount')} />
+			</Form.Group>
+
+			<Form.Group className='mb-3'>
+				<Form.Label>Fine Status</Form.Label>
+				<Form.Select {...register('fineStatus')}>
+					<option value=''>Select fine status</option>
+					<option value='unpaid'>Unpaid</option>
+					<option value='paid'>Paid</option>
+				</Form.Select>
+			</Form.Group>
+
+			<Form.Group className='mb-3'>
+				<Form.Label>Fine Issued Date</Form.Label>
+				<Form.Control type='date' {...register('fineIssuedDate')} />
+			</Form.Group>
+
 			<Button
 				className='d-flex align-items-center justify-content-center w-100 mt-4'
 				type='submit'

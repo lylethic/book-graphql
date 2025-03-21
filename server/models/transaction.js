@@ -23,6 +23,23 @@ const TransactionSchema = new Schema({
 		enum: ['borrowed', 'returned', 'overdue'],
 		required: true,
 	},
+	isLateReturn: {
+		type: Boolean,
+		default: false, // Automatically set to true if returnDate > dueDate
+	},
+	fineAmount: {
+		type: Number,
+		default: 0, // Fine amount charged for this transaction
+	},
+	fineStatus: {
+		type: String,
+		enum: ['unpaid', 'paid', 'none'],
+		default: 'none', // 'none' if no fine needed, 'unpaid' if late but not paid
+	},
+	fineIssuedDate: {
+		type: Date,
+		default: null,
+	}, // Date when fine was issued (optional, useful for history)
 });
 
 module.exports = mongoose.model('transactions', TransactionSchema);

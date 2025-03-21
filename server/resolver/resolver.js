@@ -32,6 +32,14 @@ const resolvers = {
 		transaction: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getTransactionById(id),
 
+		getTransactionIsExistFine: async (parent, args, { mongoDataMethods }) => {
+			const { limit, cursor } = args;
+			return await mongoDataMethods.getTransactionIsExistFine({
+				limit,
+				cursor,
+			});
+		},
+
 		users: async (parent, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getAllUsers(args),
 
@@ -178,7 +186,19 @@ const resolvers = {
 
 		updateTransaction: async (
 			_,
-			{ id, userId, bookId, dueDate, borrowDate, returnDate, status },
+			{
+				id,
+				userId,
+				bookId,
+				dueDate,
+				borrowDate,
+				returnDate,
+				status,
+				isLateReturn,
+				fineAmount,
+				fineStatus,
+				fineIssuedDate,
+			},
 			{ mongoDataMethods }
 		) =>
 			await mongoDataMethods.updateTransaction(id, {
@@ -188,6 +208,10 @@ const resolvers = {
 				borrowDate,
 				returnDate,
 				status,
+				isLateReturn,
+				fineAmount,
+				fineStatus,
+				fineIssuedDate,
 			}),
 
 		createReservation: async (parent, args, { mongoDataMethods }) => {
