@@ -815,6 +815,8 @@ const mongoDataMethods = {
 		}
 	},
 
+	getPublisherById: async (id) => await Publisher.findById(id),
+
 	createPublisher: async (args) => {
 		const newPublisher = new Publisher(args);
 		return await newPublisher.save();

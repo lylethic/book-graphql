@@ -211,6 +211,7 @@ const typeDefs = gql`
 
 		publisher(id: ID!): PublisherResponse
 		publishers(limit: Int, cursor: ID): PublisherPage
+		getPublisherById(id: ID!): Publisher
 
 		getCommentsByBookId(bookId: ID!, limit: Int, cursor: ID): PaginatedComments
 

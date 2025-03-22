@@ -46,9 +46,9 @@ export default function MainLayout() {
 					<TransactionList />
 				</Card>
 
-				<Card className='p-4 shadow-sm'>
+				{/* <Card className='p-4 shadow-sm'>
 					<FineList />
-				</Card>
+				</Card> */}
 
 				<Card className='p-4 shadow-sm'>
 					<PublisherList />

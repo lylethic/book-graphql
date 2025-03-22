@@ -41,9 +41,20 @@ const BookDetails = ({ bookId, refetchBooks }) => {
 							Author: {book.author.name}
 						</Card.Text>
 						<Card.Text className='text-capitalize'>
-							Age: {book.author.age}
+							{book.author.age ? `Age: ${book.author.age}` : ''}
 						</Card.Text>
 
+						<p>All books by this author</p>
+						<ul>
+							{book.author.books.map((book) => (
+								<li className='text-capitalize' key={book.id}>
+									{book.name}
+								</li>
+							))}
+						</ul>
+						<Card.Text className='text-capitalize'>
+							{book.publisher ? `Publisher: ${book.publisher.name}` : ''}
+						</Card.Text>
 						<BookDeleteButton bookId={bookId} refetchBooks={refetchBooks} />
 						<UpdateBook
 							isDialogOpen={isOpen}

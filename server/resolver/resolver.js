@@ -81,6 +81,9 @@ const resolvers = {
 		publisher: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getPublisher(id),
 
+		getPublisherById: async (parent, { id }, { mongoDataMethods }) =>
+			await mongoDataMethods.getPublisherById(id),
+
 		// review: danh gia
 		reviews: async (parent, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getAllReviews(args),
@@ -109,15 +112,17 @@ const resolvers = {
 	Book: {
 		author: async ({ authorId }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getAuthorById(authorId),
+
 		genre: async ({ genre }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getGenreById(genre),
+
 		publisher: async ({ publisherId }, args, { mongoDataMethods }) =>
-			await mongoDataMethods.getPublisher(publisherId),
+			await mongoDataMethods.getPublisherById(publisherId),
 	},
 
 	Author: {
 		books: async ({ id }, args, { mongoDataMethods }) =>
-			await mongoDataMethods.getAllBooks({ authorId: id }),
+			await mongoDataMethods.getBooks({ authorId: id }),
 	},
 
 	Transaction: {

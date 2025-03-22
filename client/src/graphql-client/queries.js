@@ -16,19 +16,28 @@ const getBooks = gql`
 `;
 
 const getSingleBook = gql`
-	query getSingleBookQuery($id: ID!) {
+	query ($id: ID!) {
 		book(id: $id) {
 			id
 			name
+			author {
+				id
+				name
+				books {
+					id
+					name
+				}
+			}
 			genre {
 				id
 				name
 				description
 			}
-			author {
+			publisher {
 				id
 				name
-				age
+				address
+				contact
 			}
 		}
 	}
@@ -52,6 +61,10 @@ const getSingleAuthor = gql`
 			id
 			name
 			age
+			books {
+				id
+				name
+			}
 		}
 	}
 `;
