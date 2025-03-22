@@ -64,6 +64,7 @@ This project is a simple CRUD (Create, Read, Update, Delete) application for man
   - NodeJS
   - API: GraphQL
   - Apollo Server
+  - Database: MongoDB
 
 ### Results:
 
