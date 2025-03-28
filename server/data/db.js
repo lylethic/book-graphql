@@ -7,8 +7,33 @@ const Reservation = require('../models/reservation');
 const Review = require('../models/review');
 const Fine = require('../models/fine');
 const Publisher = require('../models/publisher');
+const cloudinary = require('../services/uploadService');
+require('dotenv').config();
+
+const CLOUDINARY_FOLDER = process.env.CLOUDINARY_FOLDER;
 
 const mongoDataMethods = {
+	createBook: async (name, genre, authorId, publisherId, image) => {
+		try {
+			let imageUrl; // Temporary variable for Cloudinary URL
+			if (image) {
+				imageUrl = await cloudinary.uploadImage(image); // Upload base64 string
+			}
+
+			const newBook = new Book({
+				name,
+				genre,
+				authorId,
+				publisherId,
+				image: imageUrl, // Store Cloudinary URL in image field
+			});
+
+			return await newBook.save();
+		} catch (error) {
+			throw new Error(`Error creating book: ${error.message}`);
+		}
+	},
+
 	getAllBooks: async ({ limit = 50, cursor }) => {
 		let filter = {};
 		if (cursor) {
@@ -87,9 +112,22 @@ const mongoDataMethods = {
 		return await newAuthor.save();
 	},
 
-	createBook: async (args) => {
-		const newBook = new Book(args);
-		return await newBook.save();
+	createAuthors: async (authors) => {
+		if (Array.isArray(authors)) {
+			return await Author.insertMany(authors);
+		} else {
+			const newData = new Author(authors);
+			return await newData.save();
+		}
+	},
+
+	createBooks: async (books) => {
+		if (Array.isArray(books)) {
+			return await Book.insertMany(books);
+		} else {
+			const newData = new Book(books);
+			return await newData.save();
+		}
 	},
 
 	createGenre: async (args) => {
@@ -130,7 +168,7 @@ const mongoDataMethods = {
 		return await newUser.save();
 	},
 
-	createUser: async (args) => {
+	createUsers: async (args) => {
 		const existingUser = await User.findOne({ email: args.email });
 		if (existingUser) {
 			throw new Error('Email already exists');
@@ -261,14 +299,27 @@ const mongoDataMethods = {
 		}
 	},
 
-	updateBook: async (id, args) => {
+	updateBook: async (id, name, genre, authorId, publisherId, image) => {
 		try {
-			const updatedBook = await Book.findByIdAndUpdate(id, args, { new: true });
-			if (!updatedBook) throw new Error('Book not found');
-			return updatedBook;
+			let imageUrl;
+			if (image && !image.startsWith('http')) {
+				// Only upload if it's a base64 string
+				imageUrl = await cloudinary.uploadImage(image);
+			} else {
+				imageUrl = image; // Use existing URL if provided
+			}
+
+			const updateData = {
+				name,
+				genre,
+				authorId,
+				publisherId: publisherId || undefined,
+				...(imageUrl && { image: imageUrl }), // Update image only if provided
+			};
+
+			return await Book.findByIdAndUpdate(id, updateData, { new: true });
 		} catch (error) {
-			console.error(error);
-			throw new Error(`Failed to update book with id: ${id}`);
+			throw new Error(`Error updating book: ${error.message}`);
 		}
 	},
 

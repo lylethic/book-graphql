@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { Table, Button, Form, Badge } from 'react-bootstrap';
+import { Table, Button, Form, Badge, Spinner } from 'react-bootstrap';
 import { getAllTransactions } from '../../graphql-client/queries';
 import TransactionDetail from './transaction-detail';
 import TransactionDeleteButton from './transaction-delete-button';
 import AddTransactionButton from './add-transaction-button';
 import UpdateTransactionButton from './update-transaction-button';
 import FineAddButton from './fine-add-button';
+import { toast } from 'react-toastify';
 
 const TransactionsList = () => {
 	const [filterStatus, setFilterStatus] = useState('');
@@ -17,8 +18,11 @@ const TransactionsList = () => {
 		}
 	);
 
-	if (loading) return <p>Loading transactions...</p>;
-	if (error) return <p>Error loading transactions...</p>;
+	if (loading) return <Spinner animation='border' />;
+	if (error) {
+		toast.error('Error loading transactions...');
+		return <p>Error loading transactions...</p>;
+	}
 
 	const formatDate = (timestamp) => {
 		const date = new Date(parseInt(timestamp, 10));
@@ -98,7 +102,7 @@ const TransactionsList = () => {
 									<td>
 										{transaction.userId ? transaction.userId.name : 'N/A'}
 									</td>
-									<td>{transaction.bookId.name}</td>
+									<td>{transaction.bookId ? transaction.bookId.name : ''}</td>
 									<td>{formatDate(transaction.borrowDate)}</td>
 									<td>{formatDate(transaction.dueDate)}</td>
 									<td>

@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import { deleteBook } from '../graphql-client/mutation';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { toast } from 'react-toastify';
+import { MdRestoreFromTrash } from 'react-icons/md';
 
 export default function BookDeleteButton({ bookId, refetchBooks }) {
 	const [showModal, setShowModal] = useState(false);
@@ -12,9 +13,6 @@ export default function BookDeleteButton({ bookId, refetchBooks }) {
 			toast.success('Deleted successful!');
 			refetchBooks(bookId);
 			setShowModal(false); // Close modal after success
-		},
-		onError: () => {
-			toast.error('Failed to delete...');
 		},
 	});
 
@@ -29,12 +27,8 @@ export default function BookDeleteButton({ bookId, refetchBooks }) {
 
 	return (
 		<>
-			<Button
-				className='me-3'
-				variant='danger'
-				onClick={() => setShowModal(true)}
-			>
-				Delete
+			<Button variant='danger' onClick={() => setShowModal(true)}>
+				<MdRestoreFromTrash />
 			</Button>
 
 			<ConfirmDeleteModal

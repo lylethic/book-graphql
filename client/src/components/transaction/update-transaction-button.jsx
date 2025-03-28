@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import UpsertTransaction from './upsert-transaction';
+import UpsertTransactionForm from './upsert-transaction-form';
 import { Button, Modal } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
 import { returnBookTransation } from '../../graphql-client/mutation';

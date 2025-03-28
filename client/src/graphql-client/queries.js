@@ -3,14 +3,26 @@ import { gql } from '@apollo/client';
 const getBooks = gql`
 	query ($limit: Int, $cursor: ID) {
 		books(limit: $limit, cursor: $cursor) {
+			nextCursor
 			books {
 				id
 				name
 				genre {
 					name
 				}
+				authorId {
+					id
+					name
+					age
+				}
+				publisherId {
+					id
+					name
+					address
+					contact
+				}
+				image
 			}
-			nextCursor
 		}
 	}
 `;
@@ -20,9 +32,10 @@ const getSingleBook = gql`
 		book(id: $id) {
 			id
 			name
-			author {
+			authorId {
 				id
 				name
+				age
 				books {
 					id
 					name
@@ -33,12 +46,13 @@ const getSingleBook = gql`
 				name
 				description
 			}
-			publisher {
+			publisherId {
 				id
 				name
 				address
 				contact
 			}
+			image
 		}
 	}
 `;

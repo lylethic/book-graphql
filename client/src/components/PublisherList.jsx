@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, CardGroup, Button } from 'react-bootstrap';
+import { Card, Row, Col, CardGroup, Button, Spinner } from 'react-bootstrap';
 import PublisherDetails from './PublisherDetails';
 import { useQuery } from '@apollo/client';
 import { getAllPublishers } from '../graphql-client/queries';
 import { MdKeyboardDoubleArrowRight } from 'react-icons/md';
 import PublisherAddButton from './PublisherAddButton';
+import { toast } from 'react-toastify';
 
 const PublisherList = () => {
 	const [publisherSelected, setPublisherSelected] = useState(null);
@@ -42,8 +43,11 @@ const PublisherList = () => {
 		refetch();
 	};
 
-	if (loading) return <p>Loading publishers...</p>;
-	if (error) return <p>Error Loading publishers...</p>;
+	if (loading) return <Spinner animation='border' />;
+	if (error) {
+		toast.error('Error loading... ');
+		return <p>Error Loading publishers...</p>;
+	}
 
 	return (
 		<Row>

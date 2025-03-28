@@ -1,7 +1,9 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-import MainLayout from './components/layout';
+import ClientLayout from './components/layout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { storeRoutes } from './routes';
 
 const client = new ApolloClient({
 	uri: 'http://localhost:4000/graphql',
@@ -11,7 +13,15 @@ const client = new ApolloClient({
 function App() {
 	return (
 		<ApolloProvider client={client}>
-			<MainLayout />
+			<Router>
+				<Routes>
+					<Route path='/' element={<ClientLayout />}>
+						{storeRoutes.map((route, index) => (
+							<Route key={index} path={route.path} element={route.element} />
+						))}
+					</Route>
+				</Routes>
+			</Router>
 			<ToastContainer position='top-right' autoClose={3000} />
 		</ApolloProvider>
 	);

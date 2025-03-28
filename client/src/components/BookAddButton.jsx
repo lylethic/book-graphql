@@ -27,6 +27,7 @@ export default function BookAddButton({ book, refetch }) {
 						book={book}
 						isDialogOpen={isDialogOpen}
 						setIsDialogOpen={setIsDialogOpen}
+						refetch={refetch}
 					/>
 				</Modal.Body>
 			</Modal>

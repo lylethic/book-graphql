@@ -1,5 +1,3 @@
-const mongoDataMethods = require('../data/db');
-
 const resolvers = {
 	//Query
 	Query: {
@@ -110,13 +108,13 @@ const resolvers = {
 	},
 
 	Book: {
-		author: async ({ authorId }, args, { mongoDataMethods }) =>
+		authorId: async ({ authorId }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getAuthorById(authorId),
 
 		genre: async ({ genre }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getGenreById(genre),
 
-		publisher: async ({ publisherId }, args, { mongoDataMethods }) =>
+		publisherId: async ({ publisherId }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getPublisherById(publisherId),
 	},
 
@@ -126,8 +124,10 @@ const resolvers = {
 	},
 
 	Transaction: {
-		userId: async ({ userId }, args, { mongoDataMethods }) =>
-			await mongoDataMethods.getUserById(userId),
+		userId: async (_, args, { mongoDataMethods }) => {
+			const { userId } = args;
+			await mongoDataMethods.getUserById(userId);
+		},
 		bookId: async ({ bookId }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getBookById(bookId),
 	},
@@ -158,12 +158,37 @@ const resolvers = {
 		createAuthor: async (parent, args, { mongoDataMethods }) =>
 			await mongoDataMethods.createAuthor(args),
 
-		createBook: async (parent, args, { mongoDataMethods }) =>
-			await mongoDataMethods.createBook(args),
+		createAuthors: async (_, args, { mongoDataMethods }) => {
+			const { authors } = args;
+			return await mongoDataMethods.createAuthors(authors);
+		},
+
+		// createImage: async (
+		// 	_,
+		// 	{ image, cloudinaryFolder },
+		// 	{ mongoDataMethods }
+		// ) => {
+		// 	return await mongoDataMethods.createImage({ image, cloudinaryFolder });
+		// },
+
+		createBook: async (_, args, { mongoDataMethods }) => {
+			const { name, genre, authorId, publisherId, image } = args;
+			return await mongoDataMethods.createBook(
+				name,
+				genre,
+				authorId,
+				publisherId,
+				image
+			);
+		},
+
+		createBooks: async (_, args, { mongoDataMethods }) => {
+			const { books } = args;
+			return await mongoDataMethods.createBooks(books);
+		},
 
 		createGenre: async (parent, args, { mongoDataMethods }) =>
 			await mongoDataMethods.createGenre(args),
-
 		createGenres: async (parent, args, { mongoDataMethods }) => {
 			const { genres } = args;
 			return await mongoDataMethods.createGenres(genres);
@@ -301,15 +326,17 @@ const resolvers = {
 
 		updateBook: async (
 			_,
-			{ id, name, genre, authorId, publisherId },
+			{ id, name, genre, authorId, publisherId, image },
 			{ mongoDataMethods }
 		) => {
-			return await mongoDataMethods.updateBook(id, {
+			return await mongoDataMethods.updateBook(
+				id,
 				name,
 				genre,
 				authorId,
 				publisherId,
-			});
+				image
+			);
 		},
 
 		updateAuthor: async (_, { id, name, age }, { mongoDataMethods }) => {

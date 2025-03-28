@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { getAuthors } from '../graphql-client/queries';
-import { Card, Row, Col, CardGroup, Button } from 'react-bootstrap';
+import { Card, Row, Col, CardGroup, Button, Spinner } from 'react-bootstrap';
 import AuthorDetails from './AuthorDetails';
 import { MdKeyboardDoubleArrowRight } from 'react-icons/md';
 import AuthorAddButton from './AuthorAddButton';
+import { toast } from 'react-toastify';
 
 const AuthorList = () => {
 	const [authorSelected, setAuthorSelected] = useState(null);
@@ -52,8 +53,11 @@ const AuthorList = () => {
 		setAuthorList((pre) => pre.filter((g) => g.id !== deleteAuthorId));
 	};
 
-	if (loading) return <p>Loading authors...</p>;
-	if (error) return <p>Error Loading authors...</p>;
+	if (loading) return <Spinner animation='border' />;
+	if (error) {
+		toast.error('Error loading authors...');
+		return <p>Error loading authors...</p>;
+	}
 
 	return (
 		<Row className='my-4'>

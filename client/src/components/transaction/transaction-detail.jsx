@@ -2,7 +2,7 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 import React, { Fragment, useState } from 'react';
 import { getSingleTransaction } from '../../graphql-client/queries';
 import { Button, Card, Modal } from 'react-bootstrap';
-import UpsertTransaction from './upsert-transaction';
+import UpsertTransactionForm from './upsert-transaction-form';
 
 export default function TransactionDetail({ transactionId }) {
 	const [isOpen, setIsOpen] = useState(false);
@@ -34,7 +34,7 @@ export default function TransactionDetail({ transactionId }) {
 					<Modal.Title>Update Transaction</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<UpsertTransaction transaction={transaction} />
+					<UpsertTransactionForm transaction={transaction} />
 				</Modal.Body>
 			</Modal>
 		</div>

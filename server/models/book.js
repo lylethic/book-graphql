@@ -5,6 +5,10 @@ const BookSchema = new Schema({
 	name: {
 		type: String,
 	},
+	image: {
+		type: String,
+		default: null,
+	},
 	genre: {
 		type: String,
 	},

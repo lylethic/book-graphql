@@ -1,0 +1,27 @@
+.nav-link {
+	color: #333;
+	padding-bottom: 5px;
+	text-decoration: none;
+	position: relative;
+	transition: all 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+	color: #007bff;
+}
+
+.custom-active {
+	font-weight: bold;
+	color: #007bff !important;
+}
+
+.custom-active::after {
+	content: '';
+	display: block;
+	width: 100%;
+	height: 4px; /* Thicker underline */
+	background-color: #007bff;
+	position: absolute;
+	bottom: -3px;
+	left: 0;
+}

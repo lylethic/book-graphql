@@ -1,15 +1,19 @@
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import {
 	createTransaction,
 	updateTransaction,
 } from '../../graphql-client/mutation';
-import { getAllTransactions } from '../../graphql-client/queries';
+import {
+	getAllTransactions,
+	getBooks,
+	getUsers,
+} from '../../graphql-client/queries';
 import { Button, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
-export default function UpsertTransaction({
+export default function UpsertTransactionForm({
 	isDialogOpen,
 	setIsDialogOpen,
 	transaction,
@@ -20,6 +24,7 @@ export default function UpsertTransaction({
 		setValue,
 		reset,
 		formState: { errors },
+		control,
 	} = useForm({
 		defaultValues: {
 			id: '',
@@ -37,6 +42,9 @@ export default function UpsertTransaction({
 		},
 		criteriaMode: 'all',
 	});
+
+	const { data: userData, loading: userLoading } = useQuery(getUsers);
+	const { data: bookData, loading: bookLoading } = useQuery(getBooks);
 
 	const [addNewTransaction] = useMutation(createTransaction, {
 		onCompleted: () => {
@@ -91,9 +99,9 @@ export default function UpsertTransaction({
 				dueDate: formData.dueDate,
 				returnDate: formData.returnDate || null,
 				status: formData.status,
-				isLateReturn: formData.isLateReturn,
+				isLateReturn: formData.isLateReturn || false,
 				fineAmount: parseFloat(formData.fineAmount),
-				fineStatus: formData.fineStatus,
+				fineStatus: formData.fineStatus || 'none',
 				fineIssuedDate: formData.fineIssuedDate || null,
 			};
 
@@ -112,23 +120,71 @@ export default function UpsertTransaction({
 		<Form onSubmit={handleSubmit(onSubmit)}>
 			<Form.Group className='mb-3'>
 				<Form.Label>User ID</Form.Label>
-				<Form.Control
-					type='text'
-					{...register('userId', { required: 'User ID is required' })}
-					isInvalid={!!errors.userId}
-				/>
-				<Form.Control.Feedback type='invalid'>
-					{errors.userId?.message}
-				</Form.Control.Feedback>
+				{userLoading ? (
+					<p>Loading users...</p>
+				) : (
+					<Controller
+						name='genre'
+						control={control}
+						rules={{ required: 'Please select a user.' }}
+						render={({ field }) => (
+							<Form.Select
+								className='text-capitalize'
+								aria-label='Please select a user'
+								{...field}
+								isInvalid={!!errors.userId}
+							>
+								<option value=''>Please select a user...</option>
+								{userData?.users.users.map((key) => (
+									<option
+										key={key.id}
+										value={key.id}
+										className='text-capitalize'
+									>
+										{key.name}
+									</option>
+								))}
+							</Form.Select>
+						)}
+					/>
+				)}
+				{errors.userId && (
+					<Form.Control.Feedback type='invalid'>
+						{errors.userId?.message}
+					</Form.Control.Feedback>
+				)}
 			</Form.Group>
 
 			<Form.Group className='mb-3'>
 				<Form.Label>Book ID</Form.Label>
-				<Form.Control
-					type='text'
-					{...register('bookId', { required: 'Book ID is required' })}
-					isInvalid={!!errors.bookId}
-				/>
+				{bookLoading ? (
+					<p>Loading books...</p>
+				) : (
+					<Controller
+						name='bookId'
+						control={control}
+						rules={{ required: 'Please select a book.' }}
+						render={({ field }) => (
+							<Form.Select
+								className='text-capitalize'
+								aria-label='Please select a genre'
+								{...field}
+								isInvalid={!!errors.bookId}
+							>
+								<option value=''>Please select a book...</option>
+								{bookData?.books.books.map((key) => (
+									<option
+										key={key.id}
+										value={key.id}
+										className='text-capitalize'
+									>
+										{key.name}
+									</option>
+								))}
+							</Form.Select>
+						)}
+					/>
+				)}
 				<Form.Control.Feedback type='invalid'>
 					{errors.bookId?.message}
 				</Form.Control.Feedback>
@@ -178,33 +234,41 @@ export default function UpsertTransaction({
 					{errors.status?.message}
 				</Form.Control.Feedback>
 			</Form.Group>
+			{transaction && (
+				<>
+					<Form.Group className='mb-3'>
+						<Form.Label>Is Late Return</Form.Label>
+						<Form.Select {...register('isLateReturn')}>
+							<option value='false'>No</option>
+							<option value='true'>Yes</option>
+						</Form.Select>
+					</Form.Group>
 
-			<Form.Group className='mb-3'>
-				<Form.Label>Is Late Return</Form.Label>
-				<Form.Select {...register('isLateReturn')}>
-					<option value='false'>No</option>
-					<option value='true'>Yes</option>
-				</Form.Select>
-			</Form.Group>
+					<Form.Group className='mb-3'>
+						<Form.Label>Fine Amount</Form.Label>
+						<Form.Control
+							type='number'
+							step='0.01'
+							{...register('fineAmount')}
+						/>
+					</Form.Group>
 
-			<Form.Group className='mb-3'>
-				<Form.Label>Fine Amount</Form.Label>
-				<Form.Control type='number' step='0.01' {...register('fineAmount')} />
-			</Form.Group>
+					<Form.Group className='mb-3'>
+						<Form.Label>Fine Status</Form.Label>
+						<Form.Select {...register('fineStatus')}>
+							<option value=''>Select fine status</option>
+							<option value='unpaid'>Unpaid</option>
+							<option value='paid'>Paid</option>
+							<option value='none'>None</option>
+						</Form.Select>
+					</Form.Group>
 
-			<Form.Group className='mb-3'>
-				<Form.Label>Fine Status</Form.Label>
-				<Form.Select {...register('fineStatus')}>
-					<option value=''>Select fine status</option>
-					<option value='unpaid'>Unpaid</option>
-					<option value='paid'>Paid</option>
-				</Form.Select>
-			</Form.Group>
-
-			<Form.Group className='mb-3'>
-				<Form.Label>Fine Issued Date</Form.Label>
-				<Form.Control type='date' {...register('fineIssuedDate')} />
-			</Form.Group>
+					<Form.Group className='mb-3'>
+						<Form.Label>Fine Issued Date</Form.Label>
+						<Form.Control type='date' {...register('fineIssuedDate')} />
+					</Form.Group>
+				</>
+			)}
 
 			<Button
 				className='d-flex align-items-center justify-content-center w-100 mt-4'

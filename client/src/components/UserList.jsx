@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, CardGroup, Button } from 'react-bootstrap';
+import { Card, Row, Col, CardGroup, Button, Spinner } from 'react-bootstrap';
 import { useQuery } from '@apollo/client';
 import { getUsers } from '../graphql-client/queries';
 import UserDetails from './UserDetails';
 import { MdKeyboardDoubleArrowRight } from 'react-icons/md';
 import UserAddButton from './UserAddButton';
+import { toast } from 'react-toastify';
 
 const UserList = () => {
 	const [userSelected, setUserSelected] = useState(null);
@@ -36,8 +37,11 @@ const UserList = () => {
 		refetch();
 	};
 
-	if (loading) return <p>Loading users...</p>;
-	if (error) return <p>Error Loading users...</p>;
+	if (loading) return <Spinner animation='border' />;
+	if (error) {
+		toast.error('Error loading users...');
+		return <p>Error loading users...</p>;
+	}
 
 	return (
 		<Row>

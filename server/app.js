@@ -18,14 +18,12 @@ const connectDb = async () => {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		});
-		console.log('MongoDb connected');
+		console.log('MongoDb connected!!!!');
 	} catch (error) {
 		console.log(error.message);
 		process.exit(1);
 	}
 };
-
-connectDb();
 
 const startServer = async () => {
 	const server = new ApolloServer({
@@ -38,12 +36,17 @@ const startServer = async () => {
 
 	const app = express();
 	app.use(cors());
+	app.use(express.json({ limit: '25mb' }));
+	app.use(express.urlencoded({ limit: '25mb', extended: true }));
+
 	server.applyMiddleware({ app });
 
 	app.listen({ port: 4000 }, () => {
 		console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);
 	});
 };
+
+connectDb();
 
 startServer().catch((err) => {
 	console.error('Error starting the server:', err);

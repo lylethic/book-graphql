@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 
 export default function CustomModal({ isOpen, onClose, title, children }) {
 	return (
@@ -8,6 +8,11 @@ export default function CustomModal({ isOpen, onClose, title, children }) {
 				<Modal.Title>{title}</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>{children}</Modal.Body>
+			<Modal.Footer>
+				<Button variant='secondary' onClick={onClose}>
+					Close
+				</Button>
+			</Modal.Footer>
 		</Modal>
 	);
 }

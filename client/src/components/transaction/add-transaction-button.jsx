@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import UpsertTransaction from './upsert-transaction';
+import UpsertTransactionForm from './upsert-transaction-form';
 import { Button, Modal } from 'react-bootstrap';
 
 export default function AddTransactionButton() {
@@ -22,7 +22,7 @@ export default function AddTransactionButton() {
 					<Modal.Title>Add new transaction</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<UpsertTransaction
+					<UpsertTransactionForm
 						isDialogOpen={showModal}
 						setIsDialogOpen={() => setShowModal(false)}
 					/>

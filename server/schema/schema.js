@@ -5,8 +5,17 @@ const typeDefs = gql`
 		id: ID!
 		name: String
 		genre: Genre
-		author: Author
-		publisher: Publisher
+		authorId: Author
+		publisherId: Publisher
+		image: String
+	}
+
+	input BookInput {
+		name: String
+		genre: ID
+		authorId: ID
+		publisherId: ID
+		image: String
 	}
 
 	type Author {
@@ -14,6 +23,11 @@ const typeDefs = gql`
 		name: String
 		age: Int
 		books: [Book]
+	}
+
+	input AuthorInput {
+		name: String
+		age: Int
 	}
 
 	type Genre {
@@ -105,8 +119,8 @@ const typeDefs = gql`
 	}
 
 	input TransactionInput {
-		userId: ID!
-		bookId: ID!
+		userId: String!
+		bookId: String!
 		dueDate: String!
 		borrowDate: String!
 		returnDate: String
@@ -237,12 +251,27 @@ const typeDefs = gql`
 
 	type Mutation {
 		createAuthor(name: String, age: Int): Author
+		createAuthors(authors: [AuthorInput!]!): [Author]
 		deleteAuthor(id: ID!): Author
 		updateAuthor(id: ID!, name: String, age: Int): Author
 		deleteAuthorsByCondition(ids: [ID!]!): DeleteResponse
 
-		createBook(name: String, genre: ID!, authorId: ID!, publisherId: ID): Book
-		updateBook(id: ID!, name: String, genre: String, authorId: ID): Book
+		createBook(
+			name: String
+			genre: ID!
+			authorId: ID!
+			publisherId: ID
+			image: String
+		): Book
+		createBooks(books: [BookInput!]!): [Book]
+		updateBook(
+			id: ID!
+			name: String
+			genre: String
+			authorId: String
+			publisherId: String
+			image: String
+		): Book
 		deleteBook(id: ID!): Book
 		deleteBooksByCondition(ids: [ID!]!): DeleteResponse
 
@@ -253,8 +282,8 @@ const typeDefs = gql`
 		deleteGenresByCondition(ids: [ID!]!): DeleteResponse
 
 		createTransaction(
-			userId: ID!
-			bookId: ID!
+			userId: String!
+			bookId: String!
 			dueDate: String!
 			borrowDate: String!
 			returnDate: String
@@ -271,8 +300,8 @@ const typeDefs = gql`
 
 		updateTransaction(
 			id: ID!
-			userId: ID!
-			bookId: ID!
+			userId: String!
+			bookId: String!
 			dueDate: String
 			borrowDate: String
 			returnDate: String

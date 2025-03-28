@@ -1,11 +1,23 @@
 import { gql } from '@apollo/client';
 
 const addSingleBook = gql`
-	mutation ($name: String, $genre: ID!, $authorId: ID!) {
-		createBook(genre: $genre, authorId: $authorId, name: $name) {
+	mutation (
+		$name: String
+		$genre: ID!
+		$authorId: ID!
+		$publisherId: ID
+		$image: String
+	) {
+		createBook(
+			genre: $genre
+			authorId: $authorId
+			name: $name
+			publisherId: $publisherId
+			image: $image
+		) {
 			id
 			name
-			author {
+			authorId {
 				id
 				name
 			}
@@ -13,6 +25,11 @@ const addSingleBook = gql`
 				id
 				name
 			}
+			publisherId {
+				id
+				name
+			}
+			image
 		}
 	}
 `;
@@ -115,19 +132,40 @@ const deleteGenres = gql`
 `;
 
 const updateBook = gql`
-	mutation ($id: ID!, $name: String, $genre: String, $authorId: ID) {
-		updateBook(id: $id, name: $name, genre: $genre, authorId: $authorId) {
+	mutation (
+		$id: ID!
+		$name: String
+		$genre: String
+		$authorId: String
+		$publisherId: String
+		$image: String
+	) {
+		updateBook(
+			id: $id
+			name: $name
+			genre: $genre
+			authorId: $authorId
+			publisherId: $publisherId
+			image: $image
+		) {
 			id
 			name
 			genre {
 				id
 				name
 			}
-			author {
+			authorId {
 				id
 				name
 				age
 			}
+			publisherId {
+				id
+				name
+				contact
+				address
+			}
+			image
 		}
 	}
 `;
@@ -177,12 +215,16 @@ const updateUser = gql`
 
 const createTransaction = gql`
 	mutation (
-		$userId: ID!
-		$bookId: ID!
+		$userId: String!
+		$bookId: String!
 		$dueDate: String!
 		$borrowDate: String!
 		$returnDate: String
 		$status: String!
+		$isLateReturn: Boolean
+		$fineAmount: Float
+		$fineStatus: String
+		$fineIssuedDate: String
 	) {
 		createTransaction(
 			userId: $userId
@@ -191,6 +233,10 @@ const createTransaction = gql`
 			dueDate: $dueDate
 			returnDate: $returnDate
 			status: $status
+			isLateReturn: $isLateReturn
+			fineAmount: $fineAmount
+			fineStatus: $fineStatus
+			fineIssuedDate: $fineIssuedDate
 		) {
 			id
 			userId {
@@ -205,6 +251,10 @@ const createTransaction = gql`
 			borrowDate
 			returnDate
 			status
+			isLateReturn
+			fineAmount
+			fineStatus
+			fineIssuedDate
 		}
 	}
 `;
@@ -212,8 +262,8 @@ const createTransaction = gql`
 const updateTransaction = gql`
 	mutation (
 		$id: ID!
-		$userId: ID!
-		$bookId: ID!
+		$userId: String!
+		$bookId: String!
 		$dueDate: String
 		$borrowDate: String
 		$status: String
