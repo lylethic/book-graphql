@@ -181,12 +181,25 @@ const updateAuthor = gql`
 `;
 
 const createUser = gql`
-	mutation ($name: String, $email: String, $password: String, $role: String) {
-		createUser(name: $name, email: $email, password: $password, role: $role) {
+	mutation (
+		$name: String
+		$email: String
+		$password: String
+		$role: String
+		$image: String
+	) {
+		createUser(
+			name: $name
+			email: $email
+			password: $password
+			role: $role
+			image: $image
+		) {
 			id
 			name
 			email
 			role
+			image
 		}
 	}
 `;
@@ -198,6 +211,7 @@ const deleteUser = gql`
 			email
 			name
 			role
+			image
 		}
 	}
 `;
@@ -209,6 +223,7 @@ const updateUser = gql`
 			name
 			email
 			role
+			image
 		}
 	}
 `;
@@ -340,7 +355,7 @@ const addSinleReservation = gql`
 			id
 			bookId {
 				name
-				author {
+				authorId {
 					name
 				}
 			}
@@ -371,7 +386,7 @@ const updateReservation = gql`
 			id
 			bookId {
 				name
-				author {
+				authorId {
 					name
 				}
 			}
@@ -393,7 +408,7 @@ const deleteSinleReservation = gql`
 			}
 			bookId {
 				name
-				author {
+				authorId {
 					name
 				}
 				genre {
@@ -584,14 +599,14 @@ const addSingleReview = gql`
 
 const updateReview = gql`
 	mutation (
-		$updateReviewId: ID!
+		$id: ID!
 		$bookId: ID
 		$userId: ID
 		$comment: String
 		$rating: Int
 	) {
 		updateReview(
-			id: $updateReviewId
+			id: $id
 			bookId: $bookId
 			userId: $userId
 			comment: $comment
@@ -604,7 +619,7 @@ const updateReview = gql`
 				genre {
 					name
 				}
-				author {
+				authorId {
 					name
 				}
 			}

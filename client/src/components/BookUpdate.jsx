@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import BookForm from './BookForm';
+import { FaPen } from 'react-icons/fa';
 
 export default function UpdateBook({
 	isDialogOpen,
@@ -14,7 +15,7 @@ export default function UpdateBook({
 	return (
 		<>
 			<Button variant='primary' onClick={handleShow}>
-				Edit
+				<FaPen />
 			</Button>
 			<Modal
 				show={isDialogOpen}

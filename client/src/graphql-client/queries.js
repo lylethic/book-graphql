@@ -27,6 +27,32 @@ const getBooks = gql`
 	}
 `;
 
+const searchBook = gql`
+	query ($limit: Int, $cursor: ID, $search: String) {
+		searchBook(limit: $limit, cursor: $cursor, search: $search) {
+			nextCursor
+			books {
+				id
+				name
+				genre {
+					name
+				}
+				authorId {
+					id
+					name
+				}
+				publisherId {
+					id
+					name
+					address
+					contact
+				}
+				image
+			}
+		}
+	}
+`;
+
 const getSingleBook = gql`
 	query ($id: ID!) {
 		book(id: $id) {
@@ -114,8 +140,24 @@ const getUsers = gql`
 				name
 				email
 				role
+				image
 			}
 			nextCursor
+		}
+	}
+`;
+
+const searchUserByName = gql`
+	query ($limit: Int, $cursor: ID, $search: String) {
+		searchUserByName(limit: $limit, cursor: $cursor, search: $search) {
+			nextCursor
+			users {
+				id
+				name
+				email
+				role
+				image
+			}
 		}
 	}
 `;
@@ -127,6 +169,7 @@ const getSingleUser = gql`
 			name
 			email
 			role
+			image
 		}
 	}
 `;
@@ -320,20 +363,23 @@ const getAllFines = gql`
 
 // Review book
 const getCommentsByBookId = gql`
-	query ($bookId: ID!, $limit: Int) {
-		getCommentsByBookId(bookId: $bookId, limit: $limit) {
+	query ($bookId: ID!, $limit: Int, $cursor: ID) {
+		getCommentsByBookId(bookId: $bookId, limit: $limit, cursor: $cursor) {
 			nextCursor
 			comments {
 				id
+				userId {
+					id
+					name
+					email
+				}
 				bookId {
 					id
 					name
 				}
-				userId {
-					id
-					name
-				}
 				comment
+				rating
+				reviewDate
 			}
 		}
 	}
@@ -413,12 +459,13 @@ const getSingleReview = gql`
 				genre {
 					name
 				}
-				author {
+				authorId {
 					name
 				}
 			}
 			rating
 			comment
+			reviewDate
 		}
 	}
 `;
@@ -447,6 +494,7 @@ const getAllReviewsByBook = gql`
 					name
 				}
 				comment
+				reviewDate
 			}
 		}
 	}
@@ -474,4 +522,6 @@ export {
 	getAllPublishers,
 	getSingleReview,
 	getAllReviewsByBook,
+	searchBook,
+	searchUserByName,
 };

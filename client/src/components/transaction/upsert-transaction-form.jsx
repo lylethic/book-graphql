@@ -119,12 +119,12 @@ export default function UpsertTransactionForm({
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
 			<Form.Group className='mb-3'>
-				<Form.Label>User ID</Form.Label>
+				<Form.Label>User</Form.Label>
 				{userLoading ? (
 					<p>Loading users...</p>
 				) : (
 					<Controller
-						name='genre'
+						name='userId'
 						control={control}
 						rules={{ required: 'Please select a user.' }}
 						render={({ field }) => (
@@ -271,7 +271,7 @@ export default function UpsertTransactionForm({
 			)}
 
 			<Button
-				className='d-flex align-items-center justify-content-center w-100 mt-4'
+				className='d-flex align-items-center justify-content-center w-100 my-3'
 				type='submit'
 				variant='primary'
 			>

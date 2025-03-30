@@ -1,187 +1,231 @@
-import React, { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@apollo/client";
-import { Form, Button } from "react-bootstrap";
-import { addSingleReview, updateReview } from "../graphql-client/mutation";
+import React, { useState, useEffect } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import { Form, Button, Spinner } from 'react-bootstrap';
+import { addSingleReview, updateReview } from '../graphql-client/mutation';
 import {
 	getBooks,
 	getUsers,
 	getAllReviewsByBook,
-} from "../graphql-client/queries";
+} from '../graphql-client/queries';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
-const ReviewForm = ({
-	isDialogOpen,
-	setIsDialogOpen,
-	review,
-	bookId: initialBookId,
-}) => {
-	const [reviewData, setReviewData] = useState({
-		id: "",
-		bookId: initialBookId || "",
-		userId: "",
-		rating: "",
-		comment: "",
+const ReviewForm = ({ isDialogOpen, setIsDialogOpen, review, bookIdProp }) => {
+	const {
+		control,
+		handleSubmit,
+		reset,
+		watch,
+		formState: { errors },
+	} = useForm({
+		defaultValues: {
+			id: '',
+			bookId: '',
+			userId: '',
+			rating: '',
+			comment: '',
+		},
 	});
 
 	const { loading: loadingBooks, data: booksData } = useQuery(getBooks);
 	const { loading: loadingUsers, data: usersData } = useQuery(getUsers);
-	useEffect(() => {
-		console.log("booksData:", booksData);
-		console.log("usersData:", usersData);
-	}, [booksData, usersData]);
 
-	// Update form when a review is passed (edit mode)
 	useEffect(() => {
 		if (review) {
-			setReviewData({
+			reset({
 				id: review.id,
-				bookId: review.bookId?.id || "",
-				userId: review.userId?.id || "",
-				rating: review.rating || "",
-				comment: review.comment || "",
+				bookId: review.bookId?.id || '',
+				userId: review.userId?.id || '',
+				rating: review.rating || '',
+				comment: review.comment || '',
+			});
+		} else {
+			reset({
+				id: '',
+				bookId: '',
+				userId: '',
+				rating: '',
+				comment: '',
 			});
 		}
-	}, [review]);
-
-	const { id, bookId, userId, rating, comment } = reviewData;
-
-	const onInputChange = (event) => {
-		setReviewData({
-			...reviewData,
-			[event.target.name]: event.target.value,
-		});
-	};
+	}, [review, reset]);
 
 	// GraphQL operations
-	const [addReview] = useMutation(addSingleReview, {
+	const [addReview, { loading }] = useMutation(addSingleReview, {
 		refetchQueries: [
 			{
 				query: getAllReviewsByBook,
-				variables: { bookId, limit: 5, cursor: null },
+				variables: { bookId: bookIdProp, limit: 5, cursor: null },
 			},
 		],
 		onCompleted: () => {
-			alert("Review added successfully!");
-			setReviewData({
-				bookId: "",
-				userId: "",
-				rating: "",
-				comment: "",
-				id: "",
-			});
+			toast.success('Review added successfully!');
+			reset();
 		},
 	});
 
-	const [editReview] = useMutation(updateReview);
-
-	const onSubmit = async (e) => {
-		e.preventDefault();
-
-		if (review) {
-			// Update existing review
-			await editReview({
-				variables: {
-					updateReviewId: review.id,
-					bookId,
-					userId,
-					rating: parseInt(rating),
-					comment,
-				},
-			});
+	const [editReview] = useMutation(updateReview, {
+		onCompleted: () => {
+			toast.success('Review updated successfully!');
 			setIsDialogOpen(false);
-		} else {
-			await addReview({
-				variables: {
-					bookId,
-					userId,
-					rating: parseInt(rating),
-					comment,
-				},
-			});
+		},
+		onError: (error) => {
+			toast.error('Failed to update review: ' + error.message);
+		},
+	});
+
+	const onSubmit = async (data) => {
+		try {
+			if (review) {
+				// Update existing review
+				await editReview({
+					variables: {
+						id: data.id,
+						bookId: data.bookId?.id || data.bookId,
+						userId: data.userId?.id || data.userId,
+						rating: data.rating ? parseInt(data.rating) : data.rating,
+						comment: data.comment,
+					},
+				});
+				setIsDialogOpen(false);
+			} else {
+				await addReview({
+					variables: {
+						bookId: data.bookId,
+						userId: data.userId,
+						rating: data.rating ? parseInt(data.rating) : data.rating,
+						comment: data.comment,
+					},
+				});
+			}
+		} catch (error) {
+			toast.error('Error processing form: ' + error.message);
 		}
-		setReviewData({
-			id: "",
-			bookId: "",
-			userId: "",
-			rating: "",
-			comment: "",
-		});
 	};
 
 	return (
-		<Form onSubmit={onSubmit}>
-			{review && (
-				<Form.Group>
-					<Form.Control
-						className="mb-2"
-						type="text"
-						placeholder="Review ID..."
-						name="id"
-						value={id}
-						disabled
-					/>
-				</Form.Group>
+		<>
+			{loading ? (
+				<Spinner className='my-2' />
+			) : (
+				<Form onSubmit={handleSubmit(onSubmit)}>
+					{review && (
+						<Form.Group>
+							<Form.Label>Review ID</Form.Label>
+							<Controller
+								name='id'
+								control={control}
+								render={({ field }) => (
+									<Form.Control
+										className='mb-2'
+										type='text'
+										placeholder='Review ID...'
+										{...field}
+										disabled
+									/>
+								)}
+							/>
+						</Form.Group>
+					)}
+					<Form.Group>
+						<Form.Label>Select Book</Form.Label>
+						<Controller
+							name='bookId'
+							control={control}
+							rules={{ required: 'Please select a book.' }}
+							render={({ field }) => (
+								<Form.Select
+									className='mb-2'
+									aria-label='Please select a book'
+									{...field}
+									isInvalid={!!errors.bookId}
+								>
+									<option value=''>Choose a book...</option>
+									{!loadingBooks &&
+										Array.isArray(booksData?.books?.books) &&
+										booksData.books.books.map((book) => (
+											<option key={book.id} value={book.id}>
+												{book.name}
+											</option>
+										))}
+								</Form.Select>
+							)}
+						/>
+					</Form.Group>
+
+					<Form.Group>
+						<Form.Label>Select User</Form.Label>
+						<Controller
+							name='userId'
+							control={control}
+							rules={{ required: 'Please select a user.' }}
+							render={({ field }) => (
+								<Form.Select
+									className='mb-2'
+									aria-label='Please select a user'
+									{...field}
+									isInvalid={!!errors.userId}
+								>
+									<option value=''>Choose a user...</option>
+									{!loadingUsers &&
+										Array.isArray(usersData?.users?.users) &&
+										usersData.users.users.map((user) => (
+											<option key={user.id} value={user.id}>
+												{user.name}
+											</option>
+										))}
+								</Form.Select>
+							)}
+						/>
+					</Form.Group>
+
+					<Form.Group>
+						<Controller
+							name='rating'
+							control={control}
+							rules={{ required: 'Please provide a rating.' }}
+							render={({ field }) => (
+								<Form.Control
+									className='mb-2'
+									type='number'
+									placeholder='Rating (1-5)...'
+									{...field}
+									min='1'
+									max='5'
+									isInvalid={!!errors.rating}
+								/>
+							)}
+						/>
+					</Form.Group>
+					<Form.Group>
+						<Controller
+							name='comment'
+							control={control}
+							rules={{ required: 'Please provide a comment.' }}
+							render={({ field }) => (
+								<Form.Control
+									as={'textarea'}
+									rows={4}
+									className='mb-2'
+									type='text'
+									placeholder='Comment...'
+									{...field}
+									isInvalid={!!errors.comment}
+								/>
+							)}
+						/>
+					</Form.Group>
+
+					<Button
+						className='d-flex w-100 align-items-center justify-content-center my-3'
+						variant='primary'
+						type='submit'
+					>
+						{review ? 'Update Review' : 'Add Review'}
+					</Button>
+				</Form>
 			)}
-			<Form.Group>
-				<Form.Label>Select Book</Form.Label>
-				<Form.Select
-					className="mb-2"
-					name="bookId"
-					value={bookId}
-					onChange={onInputChange}>
-					<option value="">Choose a book...</option>
-					{!loadingBooks &&
-						Array.isArray(booksData?.books?.books) &&
-						booksData.books.books.map((book) => (
-							<option key={book.id} value={book.id}>
-								{book.name}
-							</option>
-						))}
-				</Form.Select>
-			</Form.Group>
-
-			<Form.Group>
-				<Form.Label>Select User</Form.Label>
-				<Form.Select
-					className="mb-2"
-					name="userId"
-					value={userId}
-					onChange={onInputChange}>
-					<option value="">Choose a user...</option>
-					{!loadingUsers &&
-						Array.isArray(usersData?.users?.users) &&
-						usersData.users.users.map((user) => (
-							<option key={user.id} value={user.id}>
-								{user.name}
-							</option>
-						))}
-				</Form.Select>
-			</Form.Group>
-
-			<Form.Group>
-				<Form.Control
-					className="mb-2"
-					type="number"
-					placeholder="Rating (1-5)..."
-					name="rating"
-					value={rating}
-					onChange={onInputChange}
-				/>
-			</Form.Group>
-			<Form.Group>
-				<Form.Control
-					className="mb-2"
-					type="text"
-					placeholder="Comment..."
-					name="comment"
-					value={comment}
-					onChange={onInputChange}
-				/>
-			</Form.Group>
-
-			<Button className="float-right" variant="primary" type="submit">
-				{review ? "Update Review" : "Add Review"}
-			</Button>
-		</Form>
+		</>
 	);
 };
 

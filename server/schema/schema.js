@@ -42,6 +42,7 @@ const typeDefs = gql`
 		email: String
 		password: String
 		role: String
+		image: String
 	}
 
 	input UserInput {
@@ -49,6 +50,7 @@ const typeDefs = gql`
 		email: String
 		password: String
 		role: String
+		image: String
 	}
 
 	type Transaction {
@@ -93,6 +95,14 @@ const typeDefs = gql`
 		id: ID!
 		bookId: Book
 		userId: User
+		rating: Int
+		comment: String
+		reviewDate: String
+	}
+
+	input ReviewInput {
+		bookId: String
+		userId: String
 		rating: Int
 		comment: String
 	}
@@ -201,6 +211,7 @@ const typeDefs = gql`
 	type Query {
 		books(limit: Int, cursor: ID): BookPage
 		book(id: ID!): Book
+		searchBook(limit: Int, cursor: ID, search: String): BookPage
 
 		authors(limit: Int, cursor: ID): AuthorPage
 		author(id: ID!): Author
@@ -209,6 +220,7 @@ const typeDefs = gql`
 		genre(id: ID!): Genre
 
 		users(limit: Int, cursor: ID): UserPage
+		searchUserByName(limit: Int, cursor: ID, search: String): UserPage
 		user(id: ID!): User
 
 		transactions(status: String, limit: Int, cursor: ID): TransactionPage
@@ -320,6 +332,7 @@ const typeDefs = gql`
 			email: String
 			password: String
 			role: String
+			image: String
 		): User
 		createUsers(users: [UserInput!]!): [User]
 		updateUser(id: ID!, name: String, email: String, role: String): User
@@ -371,6 +384,7 @@ const typeDefs = gql`
 		deletePublishersByCondition(ids: [ID!]!): DeleteResponse
 
 		createReview(userId: ID, bookId: ID, rating: Int, comment: String): Review
+		createReviews(reviews: [ReviewInput!]!): [Review]
 
 		updateReview(
 			id: ID!

@@ -53,6 +53,28 @@ const mongoDataMethods = {
 		};
 	},
 
+	searchBookName: async ({ limit = 50, cursor, search }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Lấy _id lớn hơn cursor
+		}
+		if (search && search.trim() !== '') {
+			filter.name = { $regex: search, $options: 'i' }; // Tìm kiếm theo tên sách, ko phân biệt hoa-thường
+		}
+
+		const books = await Book.find(filter)
+			.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
+			.limit(limit)
+			.exec();
+
+		const nextCursor = books.length > 0 ? books[books.length - 1]._id : null;
+
+		return {
+			books,
+			nextCursor,
+		};
+	},
+
 	getBooks: async (condition = null) =>
 		condition === null ? await Book.find() : await Book.find(condition),
 
@@ -154,18 +176,48 @@ const mongoDataMethods = {
 		};
 	},
 
+	searchUserByName: async ({ limit = 50, cursor, search }) => {
+		let filter = {};
+		if (cursor) {
+			filter = { _id: { $gt: cursor } }; // Lấy user có _id lớn hơn cursor
+		}
+		if (search) {
+			filter.name = { $regex: search, $options: 'i' }; // Tìm kiếm theo tên user, ko phân biệt hoa-thường
+		}
+
+		const users = await User.find(filter)
+			.sort({ _id: 1 }) // Sắp xếp tăng dần theo _id
+			.limit(limit)
+			.exec();
+
+		const nextCursor = users.length > 0 ? users[users.length - 1]._id : null;
+
+		return {
+			users,
+			nextCursor,
+		};
+	},
+
 	getUsers: async (condition = null) =>
 		condition === null ? await User.find() : await User.find(condition),
 
 	getUserById: async (id) => await User.findById(id),
 
 	createUser: async (args) => {
-		const existingUser = await User.findOne({ email: args.email });
-		if (existingUser) {
-			throw new Error('Email already exists');
+		try {
+			let imageUrl;
+			if (args.image) {
+				imageUrl = await cloudinary.uploadImage(args.image); // Upload base64 string
+			}
+			const existingUser = await User.findOne({ email: args.email });
+			if (existingUser) {
+				throw new Error('Email already exists');
+			}
+			const newUser = new User({ ...args, image: imageUrl });
+			return await newUser.save();
+		} catch (error) {
+			throw new Error(`Error creating user: ${error.message}`);
 		}
-		const newUser = new User(args);
-		return await newUser.save();
 	},
 
 	createUsers: async (args) => {
@@ -981,6 +1033,15 @@ const mongoDataMethods = {
 	createReview: async (args) => {
 		const newReview = new Review(args);
 		return await newReview.save();
+	},
+
+	createReviews: async (reviews) => {
+		if (Array.isArray(reviews)) {
+			return await Review.insertMany(reviews);
+		} else {
+			const newReview = new Review(reviews);
+			return await newReview.save();
+		}
 	},
 
 	updateReview: async (id, args) => {

@@ -4,6 +4,9 @@ const resolvers = {
 		books: async (parent, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getAllBooks(args),
 
+		searchBook: async (parent, args, { mongoDataMethods }) =>
+			await mongoDataMethods.searchBookName(args),
+
 		book: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getBookById(id),
 
@@ -40,6 +43,9 @@ const resolvers = {
 
 		users: async (parent, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getAllUsers(args),
+
+		searchUserByName: async (parent, args, { mongoDataMethods }) =>
+			await mongoDataMethods.searchUserByName(args),
 
 		user: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.getUserById(id),
@@ -124,10 +130,8 @@ const resolvers = {
 	},
 
 	Transaction: {
-		userId: async (_, args, { mongoDataMethods }) => {
-			const { userId } = args;
-			await mongoDataMethods.getUserById(userId);
-		},
+		userId: async ({ userId }, args, { mongoDataMethods }) =>
+			await mongoDataMethods.getUserById(userId),
 		bookId: async ({ bookId }, args, { mongoDataMethods }) =>
 			await mongoDataMethods.getBookById(bookId),
 	},
@@ -162,14 +166,6 @@ const resolvers = {
 			const { authors } = args;
 			return await mongoDataMethods.createAuthors(authors);
 		},
-
-		// createImage: async (
-		// 	_,
-		// 	{ image, cloudinaryFolder },
-		// 	{ mongoDataMethods }
-		// ) => {
-		// 	return await mongoDataMethods.createImage({ image, cloudinaryFolder });
-		// },
 
 		createBook: async (_, args, { mongoDataMethods }) => {
 			const { name, genre, authorId, publisherId, image } = args;
@@ -261,6 +257,11 @@ const resolvers = {
 
 		createReview: async (parent, args, { mongoDataMethods }) =>
 			await mongoDataMethods.createReview(args),
+
+		createReviews: async (parent, args, { mongoDataMethods }) => {
+			const { reviews } = args;
+			return await mongoDataMethods.createReviews(reviews);
+		},
 
 		deleteBook: async (parent, { id }, { mongoDataMethods }) =>
 			await mongoDataMethods.deleteBook(id),

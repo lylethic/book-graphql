@@ -1,8 +1,9 @@
-import { useMutation } from "@apollo/client";
-import React, { useState } from "react";
-import { Button } from "react-bootstrap";
-import { deleteSingleReview } from "../graphql-client/mutation";
-import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { useMutation } from '@apollo/client';
+import React, { useState } from 'react';
+import { Button } from 'react-bootstrap';
+import { deleteSingleReview } from '../graphql-client/mutation';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
+import { FaTrash } from 'react-icons/fa';
 
 export default function ReviewDeleteButton({ reviewId, refetchReviews }) {
 	const [showModal, setShowModal] = useState(false);
@@ -18,19 +19,20 @@ export default function ReviewDeleteButton({ reviewId, refetchReviews }) {
 			await removeReview({
 				variables: { ids: [reviewId] },
 			});
-			console.log("Review deleted successfully");
+			console.log('Review deleted successfully');
 		} catch (err) {
-			console.error("Error deleting review:", err.message);
+			console.error('Error deleting review:', err.message);
 		}
 	};
 
 	return (
 		<>
 			<Button
-				className="me-3"
-				variant="danger"
-				onClick={() => setShowModal(true)}>
-				Delete
+				className='me-3'
+				variant='danger'
+				onClick={() => setShowModal(true)}
+			>
+				<FaTrash />
 			</Button>
 
 			<ConfirmDeleteModal

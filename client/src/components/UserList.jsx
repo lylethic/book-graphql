@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, CardGroup, Button, Spinner } from 'react-bootstrap';
+import { Table, Button, Spinner, Container, Image } from 'react-bootstrap';
 import { useQuery } from '@apollo/client';
 import { getUsers } from '../graphql-client/queries';
-import UserDetails from './UserDetails';
 import { MdKeyboardDoubleArrowRight } from 'react-icons/md';
-import UserAddButton from './UserAddButton';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import noImage from '../assets/no-image-available/no-img.png';
+import UserAddButton from './UserAddButton';
+import UserDeleteButton from './UserDeleteButton';
 
 const UserList = () => {
 	const [userSelected, setUserSelected] = useState(null);
@@ -13,7 +15,7 @@ const UserList = () => {
 		variables: { limit: 10, cursor: null },
 	});
 
-	// Function to load more books
+	// Function to load more users
 	const loadMore = () => {
 		fetchMore({
 			variables: { cursor: data.users.nextCursor, limit: 5 },
@@ -44,44 +46,73 @@ const UserList = () => {
 	}
 
 	return (
-		<Row>
+		<Container className='mt-4'>
 			<div className='d-flex align-items-center justify-content-between my-2'>
-				<h4 className='text-capitalize my-2'>users</h4>
+				<h4 className='text-capitalize my-2'>Users</h4>
 				<UserAddButton />
 			</div>
-			<Col xs={12} md={6} className='mb-3 mb-lg-0'>
-				<Card className='d-flex flex-row flex-wrap text-left'>
-					{data.users.users.map((user) => (
-						<Button
-							variant={userSelected !== user.id ? 'outline-primary' : 'primary'}
+
+			{/* User Table */}
+			<Table striped bordered hover responsive>
+				<thead className='bg-primary text-white'>
+					<tr>
+						<th>#</th>
+						<th>ID</th>
+						<th>Avatar</th>
+						<th>Name</th>
+						<th>Email</th>
+						<th>Role</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{data.users.users.map((user, index) => (
+						<tr
 							key={user.id}
-							border='info'
-							text='info'
-							className='m-2 shadow text-capitalize text-center pointer'
-							onClick={setUserSelected.bind(this, user.id)}
+							className={userSelected === user.id ? 'table-primary' : ''}
 						>
-							{user.name}
-						</Button>
+							<td>{index + 1}</td>
+							<td>{user.id}</td>
+							<td className='text-center'>
+								<Image
+									src={user.image || noImage}
+									width={100}
+									height={100}
+									alt={user.name}
+								/>
+							</td>
+							<td>
+								<Link
+									to={`/users/${user.id}`}
+									className='text-decoration-none text-capitalize'
+								>
+									{user.name}
+								</Link>
+							</td>
+							<td>{user.email}</td>
+							<td>{user.role}</td>
+							<td className='text-center'>
+								<UserDeleteButton
+									userId={user.id}
+									refetchUsers={handleUserDeleted}
+								/>
+							</td>
+						</tr>
 					))}
-				</Card>
-				{/* Pagination Button */}
-				{data.users.nextCursor && (
-					<Button
-						onClick={loadMore}
-						className='mt-3'
-						style={{
-							backgroundColor: '#6861ce',
-							borderColor: '#6861ce',
-						}}
-					>
-						Load More <MdKeyboardDoubleArrowRight />
-					</Button>
-				)}
-			</Col>
-			<Col xs={12} md={6}>
-				<UserDetails userId={userSelected} refetchUsers={handleUserDeleted} />
-			</Col>
-		</Row>
+				</tbody>
+			</Table>
+
+			{/* Load More Button */}
+			{data.users.nextCursor && (
+				<Button
+					onClick={loadMore}
+					className='mt-3'
+					style={{ backgroundColor: '#6861ce', borderColor: '#6861ce' }}
+				>
+					Load More <MdKeyboardDoubleArrowRight />
+				</Button>
+			)}
+		</Container>
 	);
 };
 

@@ -1,103 +1,172 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Col, Image, Row, Spinner } from 'react-bootstrap';
-import BookDetails from './BookDetails';
+import React, { useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
-import { getBooks } from '../graphql-client/queries';
+import { getBooks, searchBook } from '../graphql-client/queries';
+import noImage from '../assets/no-image-available/no-img.png';
+import { Button, Container, Image, Spinner } from 'react-bootstrap';
 import { MdKeyboardDoubleArrowRight } from 'react-icons/md';
 import BookAddButton from './BookAddButton';
-import noImage from '../assets/no-image-available/no-img.png';
-import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
 import BookDeleteButton from './BookDeleteButton';
-import UpdateBook from './BookUpdate';
+import BookSearchForm from './book-search-form';
+import { toast } from 'react-toastify';
 
-const BookList = ({ setSelectedBookId }) => {
-	const [bookSelected, setBookSelected] = useState(null);
-	const [bookList, setBookList] = useState([]);
-	const [isOpen, setIsOpen] = useState(false);
+const BookList = () => {
+	const [bookSelected, setBookSelected] = React.useState(null);
+	const [searchQuery, setSearch] = React.useState('');
 
+	// Memoized handleSearch to prevent unnecessary re-renders
+	const handleSearch = useCallback((query) => {
+		setSearch(query);
+	}, []);
+
+	// Query for fetching all books
 	const { loading, error, data, fetchMore, refetch } = useQuery(getBooks, {
-		variables: { limit: 100, cursor: null },
+		variables: { limit: 5, cursor: null, search: '' },
+		fetchPolicy: 'cache-first',
 	});
 
-	useEffect(() => {
-		if (data) {
-			setBookList((prev) => {
-				const newBooks = data.books.books.filter(
-					(ng) => !prev.some((pg) => pg.id === ng.id)
-				);
-				return [...prev, ...newBooks];
-			});
-		}
-	}, [data]);
+	// Query for searching books
+	const {
+		loading: searchLoading,
+		error: searchError,
+		data: searchData,
+		fetchMore: searchFetchMore,
+	} = useQuery(searchBook, {
+		variables: { limit: 5, cursor: null, search: searchQuery },
+		fetchPolicy: 'cache-first',
+		skip: !searchQuery, // Skip if no search query
+	});
 
+	// Load more books for getBooks query
 	const loadMoreBooks = () => {
 		fetchMore({
 			variables: { cursor: data.books.nextCursor, limit: 5 },
 			updateQuery: (prevResult, { fetchMoreResult }) => {
 				if (!fetchMoreResult) return prevResult;
+				const newBooks = fetchMoreResult.books.books.filter(
+					(ng) => !prevResult.books.books.some((pg) => pg.id === ng.id)
+				);
 				return {
 					books: {
-						books: [...prevResult.books.books, ...fetchMoreResult.books.books],
-						nextCursor: fetchMoreResult.books.nextCursor,
+						...fetchMoreResult.books,
+						books: [...prevResult.books.books, ...newBooks],
 					},
 				};
 			},
 		});
 	};
 
+	// Load more search results for searchBook query
+	const loadMoreSearch = () => {
+		searchFetchMore({
+			variables: {
+				cursor: searchData.searchBook.nextCursor,
+				limit: 5,
+				search: searchQuery,
+			},
+			updateQuery: (prevResult, { fetchMoreResult }) => {
+				if (!fetchMoreResult) return prevResult;
+				const newBooks = fetchMoreResult.searchBook.books.filter(
+					(ng) => !prevResult.searchBook.books.some((pg) => pg.id === ng.id)
+				);
+				return {
+					searchBook: {
+						...fetchMoreResult.searchBook,
+						books: [...prevResult.searchBook.books, ...newBooks],
+					},
+				};
+			},
+		});
+	};
+
+	// Handle book deletion
 	const handleBookDeleted = (deletedBookId) => {
 		if (bookSelected === deletedBookId) {
 			setBookSelected(null);
 		}
-		setBookList((prev) => prev.filter((g) => g.id !== deletedBookId));
+		refetch(); // Refetch to ensure list is up-to-date
 	};
 
-	if (loading) return <Spinner animation='border' />;
+	// Memoize books to display to avoid recomputation
+	const booksToDisplay = useMemo(() => {
+		return searchQuery
+			? searchData?.searchBook?.books || []
+			: data?.books?.books || [];
+	}, [searchQuery, searchData, data]);
+
+	// Loading and error states
+	if (loading) {
+		return <Spinner animation='border' />;
+	}
+
 	if (error) {
 		toast.error('Error loading books...');
 		return <p>Error loading books...</p>;
 	}
 
 	return (
-		<div>
+		<Container>
 			<div className='d-flex align-items-center justify-content-between my-2'>
 				<h4 className='text-capitalize my-2'>Books</h4>
 				<BookAddButton refetch={refetch} />
 			</div>
+			<BookSearchForm onSearch={handleSearch} />
 			<div className='d-flex flex-wrap gap-3 w-100 h-100'>
-				{bookList.map((book) => (
-					<div
-						key={book.id}
-						className={`d-flex flex-column align-items-center justify-content-between p-3 border rounded shadow ${
-							bookSelected === book.id ? 'ouline-primary' : 'bg-light'
-						}`}
-						style={{ cursor: 'pointer', width: '150px' }}
-						onClick={() => setBookSelected(book.id)}
-					>
-						<Image
-							src={book.image || noImage}
-							rounded
-							width={100}
-							height={100}
-							alt={book.name}
-						/>
-						<Link
-							to={`/books/${book.id}`}
-							className='mt-2 text-center text-capitalize text-decoration-none'
+				{booksToDisplay.length > 0 ? (
+					booksToDisplay.map((book) => (
+						<div
+							key={book.id}
+							className={`d-flex flex-column align-items-center justify-content-between p-3 border rounded shadow ${
+								bookSelected === book.id ? 'outline-primary' : 'bg-light'
+							}`}
+							style={{
+								width: '200px',
+								height: '300px',
+								overflow: 'hidden',
+							}}
+							onClick={() => setBookSelected(book.id)}
 						>
-							{book.name}
-						</Link>
-						<div className='d-flex justify-content-center gap-2'>
-							<BookDeleteButton
-								bookId={book.id}
-								refetchBooks={handleBookDeleted}
+							<Image
+								src={book.image || noImage}
+								rounded
+								width={'auto'}
+								height={150}
+								alt={book.name}
 							/>
+							<div
+								style={{
+									width: '100%',
+									whiteSpace: 'nowrap',
+									overflow: 'hidden',
+									textOverflow: 'ellipsis',
+									textAlign: 'center',
+								}}
+							>
+								<Link
+									to={`/books/${book.id}`}
+									className='mt-2 text-center text-capitalize text-decoration-none'
+								>
+									{book.name}
+								</Link>
+							</div>
+							<div className='d-flex justify-content-center gap-2'>
+								<BookDeleteButton
+									bookId={book.id}
+									refetchBooks={handleBookDeleted}
+								/>
+							</div>
 						</div>
-					</div>
-				))}
+					))
+				) : (
+					<p>
+						{searchQuery
+							? `No books found for "${searchQuery}".`
+							: 'No books available.'}
+					</p>
+				)}
 			</div>
-			{data.books.nextCursor && (
+			{/* Load More Buttons */}
+			{!searchQuery && data?.books?.nextCursor && (
 				<Button
 					onClick={loadMoreBooks}
 					className='mt-3'
@@ -106,8 +175,16 @@ const BookList = ({ setSelectedBookId }) => {
 					Load More <MdKeyboardDoubleArrowRight />
 				</Button>
 			)}
-			{/* <BookDetails bookId={bookSelected} refetchBooks={handleBookDeleted} /> */}
-		</div>
+			{searchQuery && searchData?.searchBook?.nextCursor && (
+				<Button
+					onClick={loadMoreSearch}
+					className='mt-3'
+					style={{ backgroundColor: '#6861ce', borderColor: '#6861ce' }}
+				>
+					Load More <MdKeyboardDoubleArrowRight />
+				</Button>
+			)}
+		</Container>
 	);
 };
 

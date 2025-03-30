@@ -1,8 +1,9 @@
-import React from "react";
-import { Button, Form, Modal } from "react-bootstrap";
-import ReviewForm from "./ReviewForm";
+import React from 'react';
+import { Button, Form, Modal } from 'react-bootstrap';
+import ReviewForm from './ReviewForm';
+import { FaPen } from 'react-icons/fa';
 
-export default function updateReview({
+export default function UpdateReview({
 	isDialogOpen,
 	setIsDialogOpen,
 	review,
@@ -13,14 +14,12 @@ export default function updateReview({
 
 	return (
 		<>
-			<Button variant="primary" onClick={handleShow}>
-				Edit
-			</Button>
 			<Modal
 				show={isDialogOpen}
 				onHide={handleClose}
-				backdrop="static"
-				keyboard={false}>
+				backdrop='static'
+				keyboard={false}
+			>
 				<Modal.Header closeButton>
 					<Modal.Title>Update Review</Modal.Title>
 				</Modal.Header>

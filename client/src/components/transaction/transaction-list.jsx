@@ -119,7 +119,15 @@ const TransactionsList = () => {
 											{transaction.status}
 										</Badge>
 									</td>
-									<td>{transaction.isLateReturn}</td>
+									<td>
+										<Badge
+											bg={
+												transaction.isLateReturn === true ? 'danger' : 'success'
+											}
+										>
+											{transaction.isLateReturn ? 'Late' : 'No'}
+										</Badge>
+									</td>
 									<td>{transaction.fineAmount}</td>
 									<td>
 										<Badge

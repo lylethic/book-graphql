@@ -80,7 +80,6 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book, refetch }) => {
 		onError: (error) => {
 			toast.error('Failed to update book: ' + error.message);
 		},
-		refetchQueries: [{ query: getBooks }],
 	});
 
 	const onSubmit = async (data) => {
