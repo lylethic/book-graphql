@@ -159,8 +159,10 @@ const resolvers = {
 
 	// MUTATION
 	Mutation: {
-		createAuthor: async (parent, args, { mongoDataMethods }) =>
-			await mongoDataMethods.createAuthor(args),
+		createAuthor: async (parent, args, { mongoDataMethods }) => {
+			const { name, age, image } = args;
+			return await mongoDataMethods.createAuthor(name, age, image);
+		},
 
 		createAuthors: async (_, args, { mongoDataMethods }) => {
 			const { authors } = args;

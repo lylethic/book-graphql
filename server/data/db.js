@@ -129,9 +129,23 @@ const mongoDataMethods = {
 
 	getGenreById: async (id) => await Genre.findById(id),
 
-	createAuthor: async (args) => {
-		const newAuthor = new Author(args);
-		return await newAuthor.save();
+	createAuthor: async (name, age, image) => {
+		try {
+			let imageUrl = null;
+			if (image) {
+				imageUrl = await cloudinary.uploadImage(image);
+			}
+
+			const newAuthor = await Author.create({
+				name,
+				age,
+				image: imageUrl,
+			});
+
+			return newAuthor;
+		} catch (error) {
+			throw new Error(`Error creating author: ${error.message}`);
+		}
 	},
 
 	createAuthors: async (authors) => {

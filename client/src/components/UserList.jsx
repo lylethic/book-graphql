@@ -19,7 +19,6 @@ import UpdateUserButton from './UpdateUserButton';
 
 const UserList = () => {
 	const [userSelected, setUserSelected] = useState(null);
-	const [isOpen, setIsOpen] = useState(false);
 
 	const { loading, error, data, refetch, fetchMore } = useQuery(getUsers, {
 		variables: { limit: 10, cursor: null },
@@ -127,23 +126,20 @@ const UserList = () => {
 										userId={user.id}
 										refetchUsers={handleUserDeleted}
 									/>
-									<UpdateUserButton
-										isDialogOpen={isOpen}
-										setIsDialogOpen={setIsOpen}
-										user={user}
-										refetchUsers={refetch}
-									/>
+									<UpdateUserButton user={user} refetchUsers={refetch} />
 								</td>
 							</tr>
 						))
 					) : (
-						<p>Not found!</p>
+						<tr>
+							<td colSpan='7'>Not found!</td>
+						</tr>
 					)}
 				</tbody>
 			</Table>
 
 			{/* Load More Button */}
-			{data.users.nextCursor && (
+			{data?.users.nextCursor && (
 				<Button
 					onClick={loadMore}
 					className='mt-3'

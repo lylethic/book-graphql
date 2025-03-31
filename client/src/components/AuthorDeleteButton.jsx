@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import { deleteAuthor } from '../graphql-client/mutation';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { toast } from 'react-toastify';
+import { MdRestoreFromTrash } from 'react-icons/md';
 
 export default function AuthorDeleteButton({ authorId, refetchAuthors }) {
 	const [showModal, setShowModal] = useState(false);
@@ -34,7 +35,7 @@ export default function AuthorDeleteButton({ authorId, refetchAuthors }) {
 				variant='danger'
 				onClick={() => setShowModal(true)}
 			>
-				Delete
+				<MdRestoreFromTrash />
 			</Button>
 
 			<ConfirmDeleteModal

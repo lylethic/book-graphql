@@ -11,7 +11,7 @@ import BookSearchForm from './book-search-form';
 import { toast } from 'react-toastify';
 
 const BookList = () => {
-	const [bookSelected, setBookSelected] = React.useState(null);
+	const [bookSelected, setBookSelected] = useState(null);
 	const [searchQuery, setSearch] = useState('');
 
 	// Memoized handleSearch to prevent unnecessary re-renders
@@ -21,21 +21,19 @@ const BookList = () => {
 
 	// Query for fetching all books
 	const { loading, error, data, fetchMore, refetch } = useQuery(getBooks, {
-		variables: { limit: 5, cursor: null, search: '' },
+		variables: { limit: 50, cursor: null, search: '' },
 		fetchPolicy: 'cache-first',
 	});
 
 	// Query for searching books
-	const {
-		loading: searchLoading,
-		error: searchError,
-		data: searchData,
-		fetchMore: searchFetchMore,
-	} = useQuery(searchBook, {
-		variables: { limit: 5, cursor: null, search: searchQuery },
-		fetchPolicy: 'cache-first',
-		skip: !searchQuery, // Skip if no search query
-	});
+	const { data: searchData, fetchMore: searchFetchMore } = useQuery(
+		searchBook,
+		{
+			variables: { limit: 5, cursor: null, search: searchQuery },
+			fetchPolicy: 'cache-first',
+			skip: !searchQuery, // Skip if no search query
+		}
+	);
 
 	// Load more books for getBooks query
 	const loadMoreBooks = () => {

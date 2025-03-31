@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import UpsertTransactionForm from './upsert-transaction-form';
 import { Button, Modal } from 'react-bootstrap';
 
-export default function AddTransactionButton() {
+export default function AddTransactionButton({ refetch }) {
 	const [showModal, setShowModal] = useState(false);
 	const handleClose = () => setShowModal(false);
 	const handleShow = () => setShowModal(true);
@@ -23,6 +23,7 @@ export default function AddTransactionButton() {
 				</Modal.Header>
 				<Modal.Body>
 					<UpsertTransactionForm
+						refetch={refetch}
 						isDialogOpen={showModal}
 						setIsDialogOpen={() => setShowModal(false)}
 					/>

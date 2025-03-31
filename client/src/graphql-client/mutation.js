@@ -35,11 +35,12 @@ const addSingleBook = gql`
 `;
 
 const addSingleAuthor = gql`
-	mutation addSingleAuthorMutation($name: String, $age: Int) {
-		createAuthor(name: $name, age: $age) {
+	mutation addSingleAuthorMutation($name: String, $age: Int, $image: String) {
+		createAuthor(name: $name, age: $age, image: $image) {
 			id
 			name
 			age
+			image
 		}
 	}
 `;
@@ -69,6 +70,7 @@ const deleteAuthor = gql`
 			id
 			name
 			age
+			image
 		}
 	}
 `;
@@ -171,11 +173,12 @@ const updateBook = gql`
 `;
 
 const updateAuthor = gql`
-	mutation ($id: ID!, $name: String, $age: Int) {
-		updateAuthor(id: $id, name: $name, age: $age) {
+	mutation ($id: ID!, $name: String, $age: Int, $image: String) {
+		updateAuthor(id: $id, name: $name, age: $age, image: $image) {
 			id
 			name
 			age
+			image
 		}
 	}
 `;

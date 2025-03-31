@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import AuthorForm from './AuthorForm';
+import { MdAdd, MdPlusOne } from 'react-icons/md';
 
 export default function AuthorAddButton({ author, refetch }) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -10,7 +11,7 @@ export default function AuthorAddButton({ author, refetch }) {
 	return (
 		<div>
 			<Button variant='success' onClick={handleShow}>
-				Add new author
+				<MdAdd /> Add new author
 			</Button>
 			<Modal
 				show={isDialogOpen}
@@ -23,7 +24,6 @@ export default function AuthorAddButton({ author, refetch }) {
 				</Modal.Header>
 				<Modal.Body>
 					<AuthorForm
-						user={author}
 						isDialogOpen={isDialogOpen}
 						setIsDialogOpen={setIsDialogOpen}
 					/>

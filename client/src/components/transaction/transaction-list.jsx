@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { Table, Button, Form, Badge, Spinner } from 'react-bootstrap';
+import {
+	Table,
+	Button,
+	Form,
+	Badge,
+	Spinner,
+	Container,
+} from 'react-bootstrap';
 import { getAllTransactions } from '../../graphql-client/queries';
 import TransactionDetail from './transaction-detail';
 import TransactionDeleteButton from './transaction-delete-button';
@@ -18,7 +25,12 @@ const TransactionsList = () => {
 		}
 	);
 
-	if (loading) return <Spinner animation='border' />;
+	if (loading)
+		return (
+			<div className='d-flex align-items-center justify-content-center my-4 w-100'>
+				<Spinner animation='border' />
+			</div>
+		);
 	if (error) {
 		toast.error('Error loading transactions...');
 		return <p>Error loading transactions...</p>;
@@ -53,10 +65,10 @@ const TransactionsList = () => {
 	};
 
 	return (
-		<div>
+		<Container fluid className='mb-4'>
 			<div className='d-flex align-items-center justify-content-between my-2'>
 				<h4 className='text-capitalize my-2'>transactions</h4>
-				<AddTransactionButton />
+				<AddTransactionButton refetch={refetch} />
 			</div>
 			<Form.Group controlId='statusFilter' className='my-2'>
 				<Form.Label className='fst-italic fw-bold'>
@@ -172,7 +184,7 @@ const TransactionsList = () => {
 					Load More
 				</Button>
 			)}
-		</div>
+		</Container>
 	);
 };
 

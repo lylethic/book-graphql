@@ -23,11 +23,13 @@ const typeDefs = gql`
 		name: String
 		age: Int
 		books: [Book]
+		image: String
 	}
 
 	input AuthorInput {
 		name: String
 		age: Int
+		image: String
 	}
 
 	type Genre {
@@ -262,10 +264,10 @@ const typeDefs = gql`
 	}
 
 	type Mutation {
-		createAuthor(name: String, age: Int): Author
+		createAuthor(name: String, age: Int, image: String): Author
 		createAuthors(authors: [AuthorInput!]!): [Author]
 		deleteAuthor(id: ID!): Author
-		updateAuthor(id: ID!, name: String, age: Int): Author
+		updateAuthor(id: ID!, name: String, age: Int, image: String): Author
 		deleteAuthorsByCondition(ids: [ID!]!): DeleteResponse
 
 		createBook(

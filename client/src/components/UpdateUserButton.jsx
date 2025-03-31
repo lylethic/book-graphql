@@ -1,14 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import UserUpdateForm from './UserUpdateForm';
 import { FaPenSquare } from 'react-icons/fa';
 
-export default function UpdateUserButton({
-	isDialogOpen,
-	setIsDialogOpen,
-	user,
-	refetchUsers,
-}) {
+export default function UpdateUserButton({ user, refetchUsers }) {
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 	const handleClose = () => setIsDialogOpen(false);
 	const handleShow = () => setIsDialogOpen(true);
 
@@ -31,6 +28,7 @@ export default function UpdateUserButton({
 						user={user}
 						isDialogOpen={isDialogOpen}
 						setIsDialogOpen={setIsDialogOpen}
+						refetchUsers={refetchUsers} // Pass refetchUsers if needed by UserUpdateForm
 					/>
 				</Modal.Body>
 			</Modal>

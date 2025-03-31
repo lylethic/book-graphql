@@ -8,6 +8,10 @@ const AuthorSchema = new Schema({
 	age: {
 		type: Number,
 	},
+	image: {
+		type: String,
+		default: null,
+	},
 });
 
 module.exports = mongoose.model('authors', AuthorSchema);

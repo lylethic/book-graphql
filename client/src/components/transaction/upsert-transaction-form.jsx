@@ -17,6 +17,7 @@ export default function UpsertTransactionForm({
 	isDialogOpen,
 	setIsDialogOpen,
 	transaction,
+	refetch,
 }) {
 	const {
 		register,
@@ -49,6 +50,8 @@ export default function UpsertTransactionForm({
 	const [addNewTransaction] = useMutation(createTransaction, {
 		onCompleted: () => {
 			toast.success('Add new Transaction successfull!');
+			setIsDialogOpen(false);
+			refetch();
 		},
 		onError: () => {
 			toast.error('Can not add transaction...');
@@ -59,6 +62,7 @@ export default function UpsertTransactionForm({
 	const [editTransaction] = useMutation(updateTransaction, {
 		onCompleted: () => {
 			toast.success('Updated successfull!');
+			setIsDialogOpen(false);
 		},
 		onError: () => {
 			toast.error('Can not update transaction...');

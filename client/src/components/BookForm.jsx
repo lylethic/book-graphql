@@ -54,11 +54,6 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book, refetch }) => {
 		}
 	}, [book, reset]);
 
-	const { loading: loadingAuthors, data: authorsData } = useQuery(getAuthors);
-	const { loading: loadingPublishers, data: publishersData } =
-		useQuery(getAllPublishers);
-	const { loading: loadingGenres, data: genreData } = useQuery(getGenres);
-
 	const [addBook] = useMutation(addSingleBook, {
 		onCompleted: () => {
 			toast.success('Book added successfully!');
@@ -74,7 +69,7 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book, refetch }) => {
 
 	const [editBook] = useMutation(updateBook, {
 		onCompleted: () => {
-			toast.success('Book updated successfully!');
+			toast.success('Book updated successfully.');
 			setIsDialogOpen(false);
 		},
 		onError: (error) => {
@@ -108,9 +103,15 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book, refetch }) => {
 				});
 			}
 		} catch (error) {
-			toast.error('Error processing form: ' + error.message);
+			toast.error('Error processing form');
+			console.error(`${error.message}`);
 		}
 	};
+
+	const { loading: loadingAuthors, data: authorsData } = useQuery(getAuthors);
+	const { loading: loadingPublishers, data: publishersData } =
+		useQuery(getAllPublishers);
+	const { loading: loadingGenres, data: genreData } = useQuery(getGenres);
 
 	const handleFileChange = (e, onChange) => {
 		const file = e.target.files[0];

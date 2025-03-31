@@ -89,6 +89,7 @@ const getAuthors = gql`
 			authors {
 				id
 				name
+				image
 			}
 			nextCursor
 		}
@@ -101,6 +102,7 @@ const getSingleAuthor = gql`
 			id
 			name
 			age
+			image
 			books {
 				id
 				name
@@ -232,7 +234,7 @@ const getSingleReservation = gql`
 			id
 			bookId {
 				name
-				author {
+				authorId {
 					name
 				}
 			}
@@ -254,7 +256,7 @@ const getAllReservations = gql`
 				bookId {
 					id
 					name
-					author {
+					authorId {
 						name
 					}
 				}
@@ -314,7 +316,7 @@ const getFine = gql`
 				bookId {
 					id
 					name
-					author {
+					authorId {
 						id
 						name
 					}
@@ -346,7 +348,7 @@ const getAllFines = gql`
 					bookId {
 						id
 						name
-						author {
+						authorId {
 							id
 							name
 						}
@@ -482,7 +484,7 @@ const getAllReviewsByBook = gql`
 					genre {
 						name
 					}
-					author {
+					authorId {
 						name
 					}
 					publisher {
