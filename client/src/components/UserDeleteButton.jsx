@@ -4,6 +4,7 @@ import { Button } from 'react-bootstrap';
 import { deleteUser } from '../graphql-client/mutation';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { toast } from 'react-toastify';
+import { MdRestoreFromTrash } from 'react-icons/md';
 
 export default function UserDeleteButton({ userId, refetchUsers }) {
 	const [showModal, setShowModal] = useState(false);
@@ -12,12 +13,15 @@ export default function UserDeleteButton({ userId, refetchUsers }) {
 			toast.success('Deleted successful!');
 			refetchUsers(userId);
 		},
+		onError: () => {
+			toast.error('Failed to delete...');
+		},
 	});
 
 	const handleDelete = async () => {
 		try {
 			await removeBook({ variables: { id: userId } });
-			console.log('User deleted successfully');
+			console.log('User deleted successfully: ', userId);
 		} catch (err) {
 			console.error('Error deleting user:', err.message);
 		}
@@ -26,11 +30,12 @@ export default function UserDeleteButton({ userId, refetchUsers }) {
 	return (
 		<>
 			<Button
-				className='me-3'
 				variant='danger'
+				className='me-3'
+				title='Delete'
 				onClick={() => setShowModal(true)}
 			>
-				Delete
+				<MdRestoreFromTrash />
 			</Button>
 
 			<ConfirmDeleteModal

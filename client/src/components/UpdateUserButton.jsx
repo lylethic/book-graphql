@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import UserUpdateForm from './UserUpdateForm';
+import { FaPenSquare } from 'react-icons/fa';
 
 export default function UpdateUserButton({
 	isDialogOpen,
@@ -13,8 +14,8 @@ export default function UpdateUserButton({
 
 	return (
 		<>
-			<Button variant='primary' onClick={handleShow}>
-				Edit
+			<Button title='Edit' variant='primary' onClick={handleShow}>
+				<FaPenSquare />
 			</Button>
 			<Modal
 				show={isDialogOpen}

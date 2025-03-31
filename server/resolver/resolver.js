@@ -348,8 +348,11 @@ const resolvers = {
 			return await mongoDataMethods.updateGenre(id, { name, description });
 		},
 
-		updateUser: async (_, { id, name, email, role }, { mongoDataMethods }) =>
-			await mongoDataMethods.updateUser(id, { name, email, role }),
+		updateUser: async (
+			_,
+			{ id, name, email, role, image },
+			{ mongoDataMethods }
+		) => await mongoDataMethods.updateUser(id, name, email, role, image),
 
 		updateReservation: async (
 			_,

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { getBooks, searchBook } from '../graphql-client/queries';
@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 
 const BookList = () => {
 	const [bookSelected, setBookSelected] = React.useState(null);
-	const [searchQuery, setSearch] = React.useState('');
+	const [searchQuery, setSearch] = useState('');
 
 	// Memoized handleSearch to prevent unnecessary re-renders
 	const handleSearch = useCallback((query) => {
@@ -96,7 +96,11 @@ const BookList = () => {
 
 	// Loading and error states
 	if (loading) {
-		return <Spinner animation='border' />;
+		return (
+			<div className='d-flex justify-content-center align-items-center w-100 h-auto p-5'>
+				<Spinner animation='border' />
+			</div>
+		);
 	}
 
 	if (error) {
@@ -105,24 +109,23 @@ const BookList = () => {
 	}
 
 	return (
-		<Container>
+		<Container fluid>
 			<div className='d-flex align-items-center justify-content-between my-2'>
 				<h4 className='text-capitalize my-2'>Books</h4>
 				<BookAddButton refetch={refetch} />
 			</div>
 			<BookSearchForm onSearch={handleSearch} />
-			<div className='d-flex flex-wrap gap-3 w-100 h-100'>
+			<div className='row g-3'>
 				{booksToDisplay.length > 0 ? (
 					booksToDisplay.map((book) => (
 						<div
 							key={book.id}
-							className={`d-flex flex-column align-items-center justify-content-between p-3 border rounded shadow ${
+							className={`mx-lg-2 mx-0 col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 d-flex flex-column align-items-center justify-content-between p-3 border rounded shadow ${
 								bookSelected === book.id ? 'outline-primary' : 'bg-light'
 							}`}
 							style={{
-								width: '200px',
-								height: '300px',
 								overflow: 'hidden',
+								minHeight: '300px',
 							}}
 							onClick={() => setBookSelected(book.id)}
 						>
@@ -165,6 +168,7 @@ const BookList = () => {
 					</p>
 				)}
 			</div>
+
 			{/* Load More Buttons */}
 			{!searchQuery && data?.books?.nextCursor && (
 				<Button

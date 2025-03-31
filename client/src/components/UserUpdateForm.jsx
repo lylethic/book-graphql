@@ -1,77 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useMutation } from '@apollo/client';
+import { Controller, useForm } from 'react-hook-form';
 import { updateUser } from '../graphql-client/mutation';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Image } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 
 const UserUpdateForm = ({ isDialogOpen, setIsDialogOpen, user }) => {
-	const [userData, setUserData] = useState({
-		id: '',
-		name: '',
-		email: '',
-		role: '',
-	});
-
-	// Update form when a book is passed (edit mode)
-	useEffect(() => {
-		if (user) {
-			setUserData({
-				id: user.id,
-				name: user.name || '',
-				email: user.email || '',
-				role: user.role || '',
-			});
-		}
-	}, [user]);
-
-	const { id, name, email, role } = userData;
-
-	const onInputChange = (event) => {
-		setUserData({ ...userData, [event.target.name]: event.target.value });
-	};
-
-	const [editUser] = useMutation(updateUser, {
-		onCompleted: () => {
-			toast.success('Updated successful!');
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		watch,
+		control,
+		formState: { errors },
+	} = useForm({
+		defaultValues: {
+			id: '',
+			name: '',
+			email: '',
+			role: '',
+			image: '',
 		},
 	});
 
-	const onSubmit = async (e) => {
-		e.preventDefault();
-
+	useEffect(() => {
 		if (user) {
-			// Update existing
-			await editUser({
-				variables: {
-					id: user.id,
-					name,
-					email,
-					role,
-				},
-			});
-			setIsDialogOpen(false);
-			console.log({
-				id: user.id,
-				name,
-				email,
-				role,
-			});
+			setValue('id', user.id);
+			setValue('name', user.name || '');
+			setValue('email', user.email || '');
+			setValue('role', user.role || '');
+			setValue('image', user.image || '');
 		}
-		setUserData({ id: '', name: '', email: '', role: '' });
+	}, [user, setValue]);
+
+	const imageValue = watch('image');
+
+	const [editUser] = useMutation(updateUser, {
+		onCompleted: () => {
+			toast.success('Updated successfully!');
+		},
+	});
+
+	const handleFileChange = (e, onChange) => {
+		const file = e.target.files[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				onChange(reader.result); // Set base64 string
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
+	const onSubmit = async (data) => {
+		try {
+			if (user) {
+				await editUser({
+					variables: {
+						...data,
+						image: data.image || user.image,
+					},
+				});
+				console.log(data);
+
+				setIsDialogOpen(false);
+			}
+		} catch (error) {
+			console.error(error.message);
+		}
 	};
 
 	return (
-		<Form onSubmit={onSubmit}>
-			<h4>{user ? '' : 'Add new user'}</h4>
+		<Form onSubmit={handleSubmit(onSubmit)}>
+			<h4>{user ? 'Edit User' : 'Add New User'}</h4>
 			{user && (
 				<Form.Group>
 					<Form.Control
 						className='mb-2'
 						type='text'
 						placeholder='UserId...'
-						name='id'
-						value={id}
-						onChange={onInputChange}
+						{...register('id')}
 						disabled
 					/>
 				</Form.Group>
@@ -80,34 +88,84 @@ const UserUpdateForm = ({ isDialogOpen, setIsDialogOpen, user }) => {
 				<Form.Control
 					className='mb-2'
 					type='text'
-					placeholder=' Username...'
-					name='name'
-					value={name}
-					onChange={onInputChange}
+					placeholder='Username...'
+					{...register('name', { required: 'Username is required' })}
 				/>
+				{errors.name && <p className='text-danger'>{errors.name.message}</p>}
 			</Form.Group>
 			<Form.Group>
 				<Form.Control
 					className='mb-2'
-					type='text'
+					type='email'
 					placeholder='Email...'
-					name='email'
-					value={email}
-					onChange={onInputChange}
+					{...register('email', {
+						required: 'Email is required',
+						pattern: {
+							value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+							message: 'Invalid email format',
+						},
+					})}
 				/>
+				{errors.email && <p className='text-danger'>{errors.email.message}</p>}
 			</Form.Group>
 			<Form.Group>
 				<Form.Control
 					className='mb-2'
 					type='text'
-					placeholder=' role...'
-					name='role'
-					value={role}
-					onChange={onInputChange}
+					placeholder='Role...'
+					{...register('role', { required: 'Role is required' })}
 				/>
+				{errors.role && <p className='text-danger'>{errors.role.message}</p>}
 			</Form.Group>
 
-			<Button className='float-right' variant='primary' type='submit'>
+			<Form.Group className='mb-2'>
+				<Form.Label>Image</Form.Label>
+				<Controller
+					name='image'
+					control={control}
+					rules={{
+						required: !user && 'Please upload an image for a new user.',
+					}}
+					render={({ field: { onChange, value, ...field } }) => (
+						<Form.Control
+							type='file'
+							accept='image/*'
+							onChange={(e) => handleFileChange(e, onChange)}
+							disabled={false}
+							isInvalid={!!errors.image}
+							{...field}
+						/>
+					)}
+				/>
+				{errors.image && (
+					<Form.Control.Feedback type='invalid'>
+						{errors.image.message}
+					</Form.Control.Feedback>
+				)}
+				{imageValue && (
+					<div className='mt-2'>
+						<p>
+							{imageValue.startsWith('http')
+								? 'Current Image:'
+								: 'Image Preview:'}
+						</p>
+						<Image
+							src={imageValue}
+							alt='User preview'
+							fluid
+							rounded
+							className='shadow-sm'
+							style={{ maxHeight: '200px', objectFit: 'cover' }}
+						/>
+					</div>
+				)}
+			</Form.Group>
+
+			<Button
+				className='d-flex justify-content-center align-items-center w-100 my-3'
+				variant='primary'
+				type='submit'
+			>
 				{user ? 'Update' : 'Add'}
 			</Button>
 		</Form>

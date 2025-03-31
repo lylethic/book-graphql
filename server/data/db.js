@@ -233,16 +233,25 @@ const mongoDataMethods = {
 		}
 	},
 
-	updateUser: async (id, args) => {
+	updateUser: async (id, name, email, role, image) => {
 		try {
-			const updateUser = await User.findByIdAndUpdate(id, args, {
-				new: true,
-			});
-			if (!updateUser) throw new Error('User not found');
-			return updateUser;
+			let imageUrl = image;
+
+			if (image && !image.startsWith('http')) {
+				// Only upload if it's a base64 string
+				imageUrl = await cloudinary.uploadImage(image);
+			}
+
+			const updateData = {
+				name,
+				email,
+				role,
+				...(imageUrl && { image: imageUrl }), // Update image only if provided
+			};
+
+			return await User.findByIdAndUpdate(id, updateData, { new: true });
 		} catch (error) {
-			console.error(error);
-			throw new Error(`Failed to update User with id: ${id}`);
+			throw new Error(`Error updating user: ${error.message}`);
 		}
 	},
 

@@ -15,6 +15,7 @@ import BookDeleteButton from './BookDeleteButton';
 import UpdateBook from './BookUpdate';
 import ReviewAddButton from './ReviewAddButton';
 import ReviewsByBook from './reviews-by-book';
+import { toast } from 'react-toastify';
 
 const BookDetails = ({ refetchBooks }) => {
 	const { id: bookId } = useParams();
@@ -26,9 +27,14 @@ const BookDetails = ({ refetchBooks }) => {
 		skip: !bookId, // Skip query if bookId is missing
 	});
 
-	if (loading) return <p className='text-center'>Loading book details...</p>;
+	if (loading) {
+		toast.info('Loading book details...');
+		return <p className='text-center'>Loading book details...</p>;
+	}
 	if (error) {
+		toast.error('Error loading book details...');
 		console.error('Error loading book details:', error.message);
+
 		return (
 			<p className='text-center text-danger'>Error loading book details!</p>
 		);
@@ -36,7 +42,7 @@ const BookDetails = ({ refetchBooks }) => {
 
 	const book = data?.book || null;
 
-	if (!book) return <p className='text-center'>No book found.</p>;
+	if (!book) return <p className='text-center'>No book found!</p>;
 
 	return (
 		<Container>

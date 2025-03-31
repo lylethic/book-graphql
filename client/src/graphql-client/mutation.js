@@ -217,8 +217,20 @@ const deleteUser = gql`
 `;
 
 const updateUser = gql`
-	mutation ($id: ID!, $email: String, $name: String, $role: String) {
-		updateUser(id: $id, name: $name, email: $email, role: $role) {
+	mutation (
+		$id: ID!
+		$email: String
+		$name: String
+		$role: String
+		$image: String
+	) {
+		updateUser(
+			id: $id
+			name: $name
+			email: $email
+			role: $role
+			image: $image
+		) {
 			id
 			name
 			email

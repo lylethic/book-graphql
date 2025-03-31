@@ -158,6 +158,7 @@ const BookForm = ({ isDialogOpen, setIsDialogOpen, book, refetch }) => {
 						/>
 					)}
 				/>
+
 				{errors.name && (
 					<Form.Control.Feedback type='invalid'>
 						{errors.name.message}

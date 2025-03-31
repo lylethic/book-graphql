@@ -7,11 +7,7 @@ export default function ClientLayout() {
 	return (
 		<main className='overflow-y-auto'>
 			<NavbarMenu />
-			<Container
-				fluid
-				style={{ backgroundColor: '#f5f7fd' }}
-				className='p-5 rounded-5 my-3'
-			>
+			<Container fluid={'md'} style={{ backgroundColor: '#f5f7fd' }}>
 				<h1 className='text-capitalize text-center text-primary-emphasis mb-3'>
 					📚 My Library
 				</h1>

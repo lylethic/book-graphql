@@ -335,7 +335,13 @@ const typeDefs = gql`
 			image: String
 		): User
 		createUsers(users: [UserInput!]!): [User]
-		updateUser(id: ID!, name: String, email: String, role: String): User
+		updateUser(
+			id: ID!
+			name: String
+			email: String
+			role: String
+			image: String
+		): User
 		deleteUser(id: ID!): User
 
 		createReservation(userId: ID!, bookId: ID!, status: String): Reservation

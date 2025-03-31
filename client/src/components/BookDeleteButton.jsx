@@ -21,6 +21,7 @@ export default function BookDeleteButton({ bookId, refetchBooks }) {
 			await removeBook({ variables: { id: bookId } });
 			console.log('Book deleted successfully');
 		} catch (err) {
+			toast.error('Failed to delete...');
 			console.error('Error deleting book:', err.message);
 		}
 	};
