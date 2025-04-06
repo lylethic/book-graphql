@@ -68,6 +68,6 @@ This project is a simple CRUD (Create, Read, Update, Delete) application for man
 
 ### Results:
 
-![Project](./client/public/book1.png)
-![Project](./client/public/author2.png)
-![Project](./client/public/transaction3.png)
+![Project](./client/public/users.png)
+![Project](./client/public/books.png)
+![Project](./client/public/add-book.png)
