@@ -2,6 +2,8 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const refreshTokenRouter = require('./routes/refreshTokenRouter.js');
+
 require('dotenv').config();
 
 // Load schema and resolver
@@ -10,6 +12,7 @@ const resolvers = require('./resolver/resolver');
 
 // Load DBMethod
 const mongoDataMethods = require('./data/db');
+const cookieParser = require('cookie-parser');
 
 //Connect to MongoDB
 const connectDb = async () => {
@@ -29,17 +32,28 @@ const startServer = async () => {
 	const server = new ApolloServer({
 		typeDefs,
 		resolvers,
-		context: () => ({ mongoDataMethods }),
+		context: ({ req, res }) => ({ req, res, mongoDataMethods }),
 	});
 
 	await server.start();
 
 	const app = express();
-	app.use(cors());
+
+	app.use(
+		cors({
+			origin: 'http://localhost:3000', // frontend domain
+			credentials: true, // allow sending cookies
+		})
+	);
+
+	app.use(cookieParser());
+
+	app.use('/refresh_token', refreshTokenRouter);
+
 	app.use(express.json({ limit: '25mb' }));
 	app.use(express.urlencoded({ limit: '25mb', extended: true }));
 
-	server.applyMiddleware({ app });
+	server.applyMiddleware({ app, cors: false });
 
 	app.listen({ port: 4000 }, () => {
 		console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);

@@ -8,9 +8,16 @@ const Review = require('../models/review');
 const Fine = require('../models/fine');
 const Publisher = require('../models/publisher');
 const cloudinary = require('../services/uploadService');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const CLOUDINARY_FOLDER = process.env.CLOUDINARY_FOLDER;
+const SECRET_KEY = process.env.SECRET_KEY;
+const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_PRIVATE_KEY;
+const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_PRIVATE_KEY;
+const REFRESH_TOKEN_COOKIE_NAME = process.env.REFRESH_TOKEN_COOKIE_NAME;
+const ACCESS_TOKEN_COOKIE_NAME = process.env.ACCESS_TOKEN_COOKIE_NAME;
 
 const mongoDataMethods = {
 	createBook: async (name, genre, authorId, publisherId, image) => {
@@ -223,14 +230,94 @@ const mongoDataMethods = {
 			if (args.image) {
 				imageUrl = await cloudinary.uploadImage(args.image); // Upload base64 string
 			}
+
 			const existingUser = await User.findOne({ email: args.email });
 			if (existingUser) {
 				throw new Error('Email already exists');
 			}
-			const newUser = new User({ ...args, image: imageUrl });
-			return await newUser.save();
+
+			var encriptedPassword = await bcrypt.hash(args.password, 10);
+
+			const newUser = new User({
+				...args,
+				email: args.email.toLowerCase(),
+				password: encriptedPassword,
+				image: imageUrl,
+			});
+
+			// Create our JWT token
+			const token = jwt.sign(
+				{
+					user_id: newUser._id,
+					email: newUser.email,
+				},
+				SECRET_KEY,
+				{
+					expiresIn: '2h',
+				}
+			);
+
+			const res = await newUser.save(); // save WITHOUT token
+
+			// save our user in mongoDB database
+			return {
+				id: res.id,
+				token, // return token in response
+				...res._doc,
+			};
 		} catch (error) {
 			throw new Error(`Error creating user: ${error.message}`);
+		}
+	},
+
+	loginUser: async (args, res) => {
+		try {
+			const email = args.email.toLowerCase();
+			const user = await User.findOne({ email });
+
+			if (user && (await bcrypt.compare(args.password, user.password))) {
+				const token = jwt.sign(
+					{
+						user_id: user._id,
+						email: user.email,
+					},
+					ACCESS_TOKEN_SECRET,
+					{
+						expiresIn: '15m',
+					}
+				);
+
+				const refreshToken = jwt.sign(
+					{ user_id: user._id, email: user.email },
+					REFRESH_TOKEN_SECRET,
+					{ expiresIn: '7d' }
+				);
+
+				user.token = token;
+
+				res.cookie(ACCESS_TOKEN_COOKIE_NAME, token, {
+					httpOnly: true,
+					maxAge: 15 * 60 * 1000,
+					sameSite: 'Lax',
+					secure: false, // set to true in production
+				});
+
+				res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+					httpOnly: true,
+					maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+					sameSite: 'Lax',
+					secure: false,
+				});
+
+				return {
+					id: user.id,
+					...user._doc,
+				};
+			} else {
+				throw new Error('Invalid email or password');
+			}
+		} catch (error) {
+			throw new Error(`Login failed: ${error.message}`);
 		}
 	},
 

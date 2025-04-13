@@ -1,6 +1,22 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
+	type TokenResponse {
+		status: String!
+		access_token: String!
+	}
+
+	type Message {
+		text: String
+		createdAt: String
+		createdBy: String
+	}
+
+	type UserResponse {
+		status: String!
+		user: User!
+	}
+
 	type Book {
 		id: ID!
 		name: String
@@ -43,6 +59,7 @@ const typeDefs = gql`
 		name: String
 		email: String
 		password: String
+		token: String
 		role: String
 		image: String
 	}
@@ -53,6 +70,16 @@ const typeDefs = gql`
 		password: String
 		role: String
 		image: String
+	}
+
+	input MessageInput {
+		text: String
+		name: String
+	}
+
+	input LoginInput {
+		email: String
+		password: String
 	}
 
 	type Transaction {
@@ -211,6 +238,9 @@ const typeDefs = gql`
 
 	#ROOT TYPE
 	type Query {
+		refreshAccessToken: TokenResponse!
+		logoutUser: Boolean!
+
 		books(limit: Int, cursor: ID): BookPage
 		book(id: ID!): Book
 		searchBook(limit: Int, cursor: ID, search: String): BookPage
@@ -224,6 +254,8 @@ const typeDefs = gql`
 		users(limit: Int, cursor: ID): UserPage
 		searchUserByName(limit: Int, cursor: ID, search: String): UserPage
 		user(id: ID!): User
+
+		message(id: ID!): Message
 
 		transactions(status: String, limit: Int, cursor: ID): TransactionPage
 		transaction(id: ID!): Transaction
@@ -264,6 +296,10 @@ const typeDefs = gql`
 	}
 
 	type Mutation {
+		# Auth
+		loginUser(email: String, password: String): User
+
+		#
 		createAuthor(name: String, age: Int, image: String): Author
 		createAuthors(authors: [AuthorInput!]!): [Author]
 		deleteAuthor(id: ID!): Author
@@ -329,6 +365,7 @@ const typeDefs = gql`
 		deleteTransaction(id: ID!): DeleteResponseMessage
 		deleteTransactionByCondition(ids: [ID!]!): DeleteResponse
 
+		createMessage(message: MessageInput): Message!
 		createUser(
 			name: String
 			email: String

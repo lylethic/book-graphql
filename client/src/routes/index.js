@@ -10,8 +10,13 @@ import AuthorList from '../components/AuthorList';
 import AuthorDetails from '../components/AuthorDetails';
 import TransactionsList from '../components/transaction/transaction-list';
 import TransactionDetail from '../components/transaction/transaction-detail';
+import LoginForm from '../components/login';
 
 export const storeRoutes = [
+	{
+		path: '/login',
+		element: <LoginForm />,
+	},
 	{
 		path: '/',
 		element: <BookList />,

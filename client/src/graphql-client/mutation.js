@@ -1,5 +1,16 @@
 import { gql } from '@apollo/client';
 
+const login = gql`
+	mutation ($email: String, $password: String) {
+		loginUser(email: $email, password: $password) {
+			name
+			email
+			role
+			token
+		}
+	}
+`;
+
 const addSingleBook = gql`
 	mutation (
 		$name: String
@@ -658,6 +669,7 @@ const deleteSingleReview = gql`
 `;
 
 export {
+	login,
 	addSingleBook,
 	addSingleAuthor,
 	addGenre,

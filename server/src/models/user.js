@@ -20,11 +20,10 @@ const UserSchema = new Schema({
 		type: String,
 		default: null,
 	},
-});
-
-UserSchema.pre('save', async function (next) {
-	if (!this.isModified('password')) return next();
-	this.password = await bcrypt.hash(this.password, 10);
+	token: {
+		type: String,
+		default: null,
+	},
 });
 
 module.exports = mongoose.model('users', UserSchema);

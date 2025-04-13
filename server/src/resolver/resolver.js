@@ -1,3 +1,5 @@
+const mongoDataMethods = require('../data/db');
+
 const resolvers = {
 	//Query
 	Query: {
@@ -193,12 +195,19 @@ const resolvers = {
 		},
 
 		createUser: async (parent, args, { mongoDataMethods }) => {
+			console.log(args);
+
 			return await mongoDataMethods.createUser(args);
 		},
 
 		createUsers: async (parent, args, { mongoDataMethods }) => {
 			const { users } = args;
 			return await mongoDataMethods.createUsers(users);
+		},
+
+		loginUser: async (parent, args, { res, mongoDataMethods }) => {
+			console.log(args);
+			return await mongoDataMethods.loginUser(args, res);
 		},
 
 		createTransactions: async (parent, args, { mongoDataMethods }) => {
