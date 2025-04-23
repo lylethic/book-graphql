@@ -13,6 +13,7 @@ const resolvers = require('./resolver/resolver');
 // Load DBMethod
 const mongoDataMethods = require('./data/db');
 const cookieParser = require('cookie-parser');
+const verifyTokenFromCookie = require('./middleware/verifyTokenFromCookie.js');
 
 //Connect to MongoDB
 const connectDb = async () => {
@@ -32,7 +33,10 @@ const startServer = async () => {
 	const server = new ApolloServer({
 		typeDefs,
 		resolvers,
-		context: ({ req, res }) => ({ req, res, mongoDataMethods }),
+		context: ({ req, res }) => {
+			const user = verifyTokenFromCookie(req);
+			return { req, res, mongoDataMethods, user };
+		},
 	});
 
 	await server.start();

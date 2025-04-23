@@ -12,10 +12,24 @@ import TransactionsList from '../components/transaction/transaction-list';
 import TransactionDetail from '../components/transaction/transaction-detail';
 import LoginForm from '../components/login';
 
+export const publicRoutes = [
+	{
+		path: '/login',
+		element: <LoginForm />,
+		role: ['admin', 'user'],
+	},
+	// {
+	// 	path: '/register',
+	// 	element: Register,
+	// 	role: ['admin', 'user'],
+	// },
+];
+
 export const storeRoutes = [
 	{
 		path: '/login',
 		element: <LoginForm />,
+		role: ['admin', 'user'],
 	},
 	{
 		path: '/',

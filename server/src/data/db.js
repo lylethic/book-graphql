@@ -280,6 +280,7 @@ const mongoDataMethods = {
 					{
 						user_id: user._id,
 						email: user.email,
+						role: user.role,
 					},
 					ACCESS_TOKEN_SECRET,
 					{

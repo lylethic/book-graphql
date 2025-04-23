@@ -13,7 +13,6 @@ import { toast } from 'react-toastify';
 const BookList = () => {
 	const [bookSelected, setBookSelected] = useState(null);
 	const [searchQuery, setSearch] = useState('');
-
 	// Memoized handleSearch to prevent unnecessary re-renders
 	const handleSearch = useCallback((query) => {
 		setSearch(query);
@@ -22,7 +21,12 @@ const BookList = () => {
 	// Query for fetching all books
 	const { loading, error, data, fetchMore, refetch } = useQuery(getBooks, {
 		variables: { limit: 50, cursor: null, search: '' },
-		fetchPolicy: 'cache-first',
+		fetchPolicy: 'cache-and-network',
+
+		onError: (error) => {
+			toast.error(`Error loading books: ${error.message}`);
+			console.error('GraphQL error:', error);
+		},
 	});
 
 	// Query for searching books
@@ -99,11 +103,6 @@ const BookList = () => {
 				<Spinner animation='border' />
 			</div>
 		);
-	}
-
-	if (error) {
-		toast.error('Error loading books...');
-		return <p>Error loading books...</p>;
 	}
 
 	return (
