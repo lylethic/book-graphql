@@ -54,6 +54,25 @@ This project is a simple CRUD (Create, Read, Update, Delete) application for man
 
 - Fine status management (paid, unpaid, none).
 
+## Authentication and Authorization
+
+- **Authentication (Login Process)**
+
+  - Authentication is the process of verifying the identity of a user. In this case, users will log in with their email and password, and upon successful verification, a JWT (JSON Web Token) will be generated and sent back to the client.
+
+_Logic Authentication_
+
+- User submits login form with email and password.
+
+- Backend checks credentials: The server verifies the provided email and password against the user database.
+
+- JWT Generation: Upon successful login, the server generates a JWT containing the user's information (such as user ID and role).
+
+- Send Token to Client: The JWT is sent as a response, typically as part of a JSON response body.
+
+- **Storing Token in Cookie**
+  - Once the JWT is generated, it needs to be securely stored on the client-side to ensure the user remains authenticated between page refreshes.
+
 ## 🛠️ Tech Stack
 
 - **Frontend:**
