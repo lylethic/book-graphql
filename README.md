@@ -71,7 +71,17 @@ _Logic Authentication_
 - Send Token to Client: The JWT is sent as a response, typically as part of a JSON response body.
 
 - **Storing Token in Cookie**
+
   - Once the JWT is generated, it needs to be securely stored on the client-side to ensure the user remains authenticated between page refreshes.
+
+- **Authorization (Role-Based Access Control)**
+  - Authorization determines what actions a user is allowed to perform based on their role or permissions. In this case, we have different user roles (e.g., admin, user).
+
+_Role-Based Authorization:_
+
+- User Roles: When a user logs in, their role (admin, user) is included in the JWT token. This role helps the server determine what the user is allowed to do.
+
+- Access Control: When the client makes requests, the server uses the role from the JWT token to check if the user has permission to perform the requested action.
 
 ## 🛠️ Tech Stack
 
