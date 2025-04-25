@@ -43,6 +43,7 @@ const startServer = async () => {
 
 	const server = new ApolloServer({
 		schema,
+		cache: 'bounded',
 		context: ({ req, res }) => {
 			const user = verifyTokenFromCookie(req);
 			return { req, res, mongoDataMethods, user };

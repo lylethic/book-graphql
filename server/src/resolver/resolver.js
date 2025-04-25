@@ -284,6 +284,10 @@ const resolvers = {
 			return await mongoDataMethods.loginUser(args, res);
 		},
 
+		logoutUser: async (parent, args, { res, mongoDataMethods }) => {
+			return await mongoDataMethods.logoutUser(res);
+		},
+
 		createTransactions: async (parent, args, { mongoDataMethods, user }) => {
 			if (!user) {
 				throw new Error('Unauthorized access!');

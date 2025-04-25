@@ -12,8 +12,7 @@ export default function AuthContextProvider({ children }) {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 	useEffect(() => {
-		const token = Cookies.get('jwt-access-token');
-		console.log('jwt-access-token: ', token);
+		const token = Cookies.get('access-token');
 
 		if (token) {
 			// Optional: decode token to get user info using jwt-decode
@@ -28,16 +27,17 @@ export default function AuthContextProvider({ children }) {
 	}, []);
 
 	const login = ({ token, role }) => {
-		// Cookies.set('jwt-access-token', token, {
-		// 	expires: new Date(Date.now() + 15 * 60 * 1000),
-		// });
+		Cookies.set('access-token', token, {
+			expires: new Date(Date.now() + 3 * 60 * 60 * 1000),
+		});
 		setUser({ token });
 		setRole(role);
 		setIsAuthenticated(true);
 	};
 
 	const logout = () => {
-		Cookies.remove('jwt-access-token');
+		Cookies.remove('access-token');
+		Cookies.remove('jwt-refresh-token');
 		setUser(null);
 		setRole(null);
 		setIsAuthenticated(false);

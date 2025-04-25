@@ -16,8 +16,8 @@ const CLOUDINARY_FOLDER = process.env.CLOUDINARY_FOLDER;
 const SECRET_KEY = process.env.SECRET_KEY;
 const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_PRIVATE_KEY;
 const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_PRIVATE_KEY;
-const REFRESH_TOKEN_COOKIE_NAME = process.env.REFRESH_TOKEN_COOKIE_NAME;
 const ACCESS_TOKEN_COOKIE_NAME = process.env.ACCESS_TOKEN_COOKIE_NAME;
+const REFRESH_TOKEN_COOKIE_NAME = process.env.REFRESH_TOKEN_COOKIE_NAME;
 
 const mongoDataMethods = {
 	createBook: async (name, genre, authorId, publisherId, image) => {
@@ -276,42 +276,49 @@ const mongoDataMethods = {
 			const user = await User.findOne({ email });
 
 			if (user && (await bcrypt.compare(args.password, user.password))) {
-				const token = jwt.sign(
+				// Generate Access Token
+				const accessToken = jwt.sign(
 					{
 						user_id: user._id,
 						email: user.email,
 						role: user.role,
 					},
 					ACCESS_TOKEN_SECRET,
-					{
-						expiresIn: '15m',
-					}
+					{ expiresIn: '3h' }
 				);
 
+				// Generate Refresh Token
 				const refreshToken = jwt.sign(
-					{ user_id: user._id, email: user.email },
+					{
+						user_id: user._id,
+						email: user.email,
+					},
 					REFRESH_TOKEN_SECRET,
 					{ expiresIn: '7d' }
 				);
 
-				user.token = token;
+				// Save token in user object if needed
+				user.token = accessToken;
 
-				res.cookie(ACCESS_TOKEN_COOKIE_NAME, token, {
+				// Send access token cookie
+				res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
 					httpOnly: true,
-					maxAge: 15 * 60 * 1000,
+					maxAge: 3 * 60 * 60 * 1000, // 3 hours
 					sameSite: 'Lax',
-					secure: false, // set to true in production
+					secure: process.env.NODE_ENV === 'production', // true in production (Render), false in dev
 				});
 
+				// Send refresh token cookie
 				res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
 					httpOnly: true,
 					maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 					sameSite: 'Lax',
-					secure: false,
+					secure: process.env.NODE_ENV === 'production',
 				});
 
+				// Return user info
 				return {
-					id: user.id,
+					id: user._id,
 					...user._doc,
 				};
 			} else {
@@ -319,6 +326,27 @@ const mongoDataMethods = {
 			}
 		} catch (error) {
 			throw new Error(`Login failed: ${error.message}`);
+		}
+	},
+
+	logoutUser: async (res) => {
+		try {
+			// Clear both access and refresh token cookies
+			res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, {
+				httpOnly: true,
+				sameSite: 'Lax',
+				secure: process.env.NODE_ENV === 'production',
+			});
+
+			res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
+				httpOnly: true,
+				sameSite: 'Lax',
+				secure: process.env.NODE_ENV === 'production',
+			});
+
+			return { success: 200, message: 'Logout successful' };
+		} catch (error) {
+			throw new Error(`Logout failed: ${error.message}`);
 		}
 	},
 

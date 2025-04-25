@@ -11,6 +11,15 @@ const login = gql`
 	}
 `;
 
+const logoutUser = gql`
+	mutation {
+		logoutUser {
+			success
+			message
+		}
+	}
+`;
+
 const addSingleBook = gql`
 	mutation (
 		$name: String
@@ -670,6 +679,7 @@ const deleteSingleReview = gql`
 
 export {
 	login,
+	logoutUser,
 	addSingleBook,
 	addSingleAuthor,
 	addGenre,

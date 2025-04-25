@@ -141,6 +141,11 @@ const typeDefs = gql`
 		message: String
 	}
 
+	type MessageResponse {
+		success: Boolean
+		message: String
+	}
+
 	type PublisherResponse {
 		data: Publisher
 		message: String
@@ -239,7 +244,6 @@ const typeDefs = gql`
 	#ROOT TYPE
 	type Query {
 		refreshAccessToken: TokenResponse!
-		logoutUser: Boolean!
 
 		books(limit: Int, cursor: ID): BookPage
 		book(id: ID!): Book
@@ -298,6 +302,7 @@ const typeDefs = gql`
 	type Mutation {
 		# Auth
 		loginUser(email: String, password: String): User
+		logoutUser: MessageResponse
 
 		#
 		createAuthor(name: String, age: Int, image: String): Author
