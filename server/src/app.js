@@ -56,7 +56,7 @@ const startServer = async () => {
 
 	app.use(
 		cors({
-			origin: process.env.PORT_CLIENT && 'http://localhost:3000', // frontend domain
+			origin: process.env.PORT_CLIENT || 'http://localhost:3000', // frontend domain
 			credentials: true, // allow sending cookies
 		})
 	);
