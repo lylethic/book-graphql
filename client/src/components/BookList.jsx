@@ -20,7 +20,7 @@ const BookList = () => {
 
 	// Query for fetching all books
 	const { loading, error, data, fetchMore, refetch } = useQuery(getBooks, {
-		variables: { limit: 50, cursor: null, search: '' },
+		variables: { limit: 21, cursor: null, search: '' },
 		fetchPolicy: 'cache-and-network',
 
 		onError: (error) => {
@@ -112,7 +112,11 @@ const BookList = () => {
 				<BookAddButton refetch={refetch} />
 			</div>
 			<BookSearchForm onSearch={handleSearch} />
-			<div className='row g-3'>
+			<div
+				className={`row g-3 ${
+					booksToDisplay.length > 1 ? 'justify-content-center' : ''
+				}`}
+			>
 				{booksToDisplay.length > 0 ? (
 					booksToDisplay.map((book) => (
 						<div

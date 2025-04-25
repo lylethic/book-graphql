@@ -31,7 +31,6 @@ const ProtectedRoute = ({ isAuthenticated, role }) => {
 
 function App() {
 	const { user, role, isAuthenticated } = useAuth();
-	console.log(isAuthenticated);
 
 	return (
 		<ApolloProvider client={client}>

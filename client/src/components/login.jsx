@@ -57,6 +57,7 @@ const LoginForm = () => {
 					password: data.password,
 				},
 			});
+			console.log('Login success!');
 		} catch (error) {
 			console.error(`${error.message}`);
 		}

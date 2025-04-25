@@ -1,11 +1,7 @@
 const resolvers = {
 	//Query
 	Query: {
-		books: async (parent, args, { mongoDataMethods, user }) => {
-			if (!user) {
-				throw new Error('Unauthorized access!');
-			}
-
+		books: async (parent, args, { mongoDataMethods }) => {
 			return await mongoDataMethods.getAllBooks(args);
 		},
 

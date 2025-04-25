@@ -1,6 +1,6 @@
 # Book CRUD with React, NodeJS, GraphQL with Apollo
 
-This project is a simple CRUD (Create, Read, Update, Delete) application for managing books. It is built using ReactJS on the front-end and GraphQL with Apollo Client for handling data fetching, state management, and communication with the server.
+This project is a simple CRUD (Create, Read, Update, Delete) application for managing books. It is built using ReactJS on the front-end and GraphQL with Apollo Client for handling data fetching, state management, and communication with the server. This project is developed for internal use only.
 
 ## 🚀 Features
 
@@ -75,7 +75,7 @@ _Logic Authentication_
   - Once the JWT is generated, it needs to be securely stored on the client-side to ensure the user remains authenticated between page refreshes.
 
 - **Authorization (Role-Based Access Control)**
-  - Authorization determines what actions a user is allowed to perform based on their role or permissions. In this case, we have different user roles (e.g., admin, user).
+  - Authorization determines what actions a user is allowed to perform based on their role or permissions. In this case, we have different user roles (admin, user).
 
 _Role-Based Authorization:_
 
@@ -94,6 +94,13 @@ _Role-Based Authorization:_
   - API: GraphQL
   - Apollo Server
   - Database: MongoDB
+
+## Run project
+
+- **Front-end:**
+  - yarn start or npn start
+- **Back-end:**
+  - yarn server
 
 ### Results:
 

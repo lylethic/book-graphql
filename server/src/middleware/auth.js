@@ -1,34 +1,60 @@
-// Create Middleware to Read Token from Cookie
-/**
- * S_1.Read the JWT from cookies
- * S_2. Verify the token
- * S_3. Add user info to context in Apollo Server
- */
-require('dotenv').config();
+const { SchemaDirectiveVisitor } = require('@graphql-tools/schema');
+const { defaultFieldResolver } = require('graphql');
 
-const jwt = require('jsonwebtoken');
-const secretKey = process.env.SECRET_KEY;
-const accessToken = process.env.JWT_ACCESS_PRIVATE_KEY;
-
-module.exports = function cookieAuthMiddleware(req, res, next) {
-	// Get token from cookie
-	const token = req.cookies.accessToken;
-
-	if (!token) {
-		return res
-			.status(401)
-			.json({ message: 'Unauthorized: No token in cookies' });
+class AuthDirective extends SchemaDirectiveVisitor {
+	visitObject(type) {
+		this.ensureFieldsWrapped(type);
+		type._requiredAuthRole = this.args.requires;
 	}
 
-	try {
-		const decoded = jwt.verify(token, secretKey);
-		req.user = decoded;
-
-		// Optional: attach token as if it's in header
-		req.headers.authorization = `Bearer ${token}`;
-
-		next();
-	} catch (err) {
-		return res.status(403).json({ message: 'Forbidden: Invalid token' });
+	visitFieldDefinition(field, details) {
+		this.ensureFieldsWrapped(details.objectType);
+		field._requiredAuthRole = this.args.requires;
 	}
-};
+
+	ensureFieldsWrapped(objectType) {
+		if (objectType._authFieldsWrapped) return;
+		objectType._authFieldsWrapped = true;
+
+		const fields = objectType.getFields();
+
+		Object.keys(fields).forEach((fieldName) => {
+			const field = fields[fieldName];
+			const { resolve = defaultFieldResolver } = field;
+
+			field.resolve = async function (...args) {
+				const [, , context] = args;
+				const requiredRole =
+					field._requiredAuthRole || objectType._requiredAuthRole;
+
+				if (!requiredRole) {
+					return resolve.apply(this, args);
+				}
+
+				if (!context.user) {
+					throw new Error('Not authenticated');
+				}
+
+				const hasRole = this.hasRole(context.user.role, requiredRole);
+
+				if (!hasRole) {
+					throw new Error(`Not authorized. Required role: ${requiredRole}`);
+				}
+
+				return resolve.apply(this, args);
+			};
+		});
+	}
+
+	// Helper to check if user has required role
+	hasRole(userRole, requiredRole) {
+		const roleHierarchy = {
+			ADMIN: ['admin'],
+			USER: ['user'],
+		};
+
+		return roleHierarchy[userRole]?.includes(requiredRole);
+	}
+}
+
+module.exports = AuthDirective;

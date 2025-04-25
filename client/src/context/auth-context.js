@@ -28,9 +28,9 @@ export default function AuthContextProvider({ children }) {
 	}, []);
 
 	const login = ({ token, role }) => {
-		Cookies.set('jwt-access-token', token, {
-			expires: new Date(Date.now() + 15 * 60 * 1000),
-		});
+		// Cookies.set('jwt-access-token', token, {
+		// 	expires: new Date(Date.now() + 15 * 60 * 1000),
+		// });
 		setUser({ token });
 		setRole(role);
 		setIsAuthenticated(true);

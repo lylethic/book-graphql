@@ -41,12 +41,13 @@ const BookSearchForm = ({ onSearch }) => {
 					className='btn'
 					onClick={handleClear}
 					style={{
+						borderTopLeftRadius: '0px',
+						borderBottomLeftRadius: '0px',
 						position: 'absolute',
-						right: '5px',
+						right: '1px',
 						top: '50%',
 						transform: 'translateY(-50%)',
 						padding: '0',
-						fontSize: '1.2rem',
 						color: '#6c757d', // Gray color to match Bootstrap's secondary
 						textDecoration: 'none', // Remove underline from link variant
 						width: '35px',

@@ -1,10 +1,17 @@
-const express = require('express');
-const { ApolloServer } = require('apollo-server-express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const refreshTokenRouter = require('./routes/refreshTokenRouter.js');
-
 require('dotenv').config();
+const mongoose = require('mongoose');
+const { ApolloServer } = require('apollo-server-express');
+const express = require('express');
+const cors = require('cors');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const refreshTokenRouter = require('./routes/refreshTokenRouter.js'); // Refresh token rest api
+const { applyMiddleware } = require('graphql-middleware');
+
+// My config permissions
+const permissions = require('./middleware/permission.js');
+
+// Verify token from cookie
+const verifyTokenFromCookie = require('./middleware/verifyTokenFromCookie.js');
 
 // Load schema and resolver
 const typeDefs = require('./schema/schema');
@@ -13,7 +20,6 @@ const resolvers = require('./resolver/resolver');
 // Load DBMethod
 const mongoDataMethods = require('./data/db');
 const cookieParser = require('cookie-parser');
-const verifyTokenFromCookie = require('./middleware/verifyTokenFromCookie.js');
 
 //Connect to MongoDB
 const connectDb = async () => {
@@ -22,7 +28,7 @@ const connectDb = async () => {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		});
-		console.log('MongoDb connected!!!!');
+		console.log('MongoDb connected.');
 	} catch (error) {
 		console.log(error.message);
 		process.exit(1);
@@ -30,9 +36,13 @@ const connectDb = async () => {
 };
 
 const startServer = async () => {
+	const schema = applyMiddleware(
+		makeExecutableSchema({ typeDefs, resolvers }),
+		permissions
+	);
+
 	const server = new ApolloServer({
-		typeDefs,
-		resolvers,
+		schema,
 		context: ({ req, res }) => {
 			const user = verifyTokenFromCookie(req);
 			return { req, res, mongoDataMethods, user };
@@ -45,7 +55,7 @@ const startServer = async () => {
 
 	app.use(
 		cors({
-			origin: 'http://localhost:3000', // frontend domain
+			origin: process.env.PORT_CLIENT, // frontend domain
 			credentials: true, // allow sending cookies
 		})
 	);
@@ -59,8 +69,8 @@ const startServer = async () => {
 
 	server.applyMiddleware({ app, cors: false });
 
-	app.listen({ port: 4000 }, () => {
-		console.log(`Server ready at http://localhost:4000${server.graphqlPath}`);
+	app.listen({ port: process.env.PORT }, () => {
+		console.log(`Server ready.`);
 	});
 };
 
