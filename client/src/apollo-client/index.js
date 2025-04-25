@@ -11,11 +11,7 @@ import Cookies from 'js-cookie';
 
 // Create an HTTP link
 const httpLink = createHttpLink({
-<<<<<<< HEAD
 	uri: process.env.REACT_APP_API_URL && 'http://localhost:4000/graphql',
-=======
-	uri: process.env.REACT_APP_API_URL || 'https://book-graphql-server.onrender.com/graphql',
->>>>>>> e0e35a654386a4d02c1f22f7ced33d6a40157178
 	credentials: 'include', // Important for sending cookies with requests
 });
 
